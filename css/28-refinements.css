@@ -93,9 +93,12 @@ html:not([data-help="off"]) .topSectionBody :is(div, p).smallNote{display:block;
 .topSectionBody .savedRosterSection{margin-top:var(--s4);padding-top:var(--s4);}
 /* These panels are driven by short forms and stacked slot rows. Keep their frames
    close to the content instead of giving each the PDF Setup ceiling. */
-#secDraftSlots > .topSectionBody{width:min(480px,92vw);}
-#menuRoster > .topSectionBody{width:min(600px,92vw);}
-#secFilter > .topSectionBody{width:min(560px,92vw);}
+#secDraftSlots > .topSectionBody,
+.topSectionBody[data-menu-owner="secDraftSlots"]{width:min(480px,92vw);}
+#menuRoster > .topSectionBody,
+.topSectionBody[data-menu-owner="menuRoster"]{width:min(600px,92vw);}
+#secFilter > .topSectionBody,
+.topSectionBody[data-menu-owner="secFilter"]{width:min(560px,92vw);}
 .settingsUndoNote{margin-top:0;}
 .resetDisclosure{width:100%;}
 .resetDisclosure > summary{
@@ -157,6 +160,36 @@ html:not([data-help="off"]) .topSectionBody :is(div, p).smallNote{display:block;
 .issueGo{width:var(--h-sm);min-width:var(--h-sm);padding:0;font-size:18px;line-height:1;}
 @media(max-width:620px){
   .modalBack .modal{height:calc(100dvh - 24px);max-height:calc(100dvh - 24px);}
+
+  /* Settings has many short controls. A wrapping flex row made long hints push
+     switches underneath the label while shorter hints kept them on the right, so
+     the same control appeared in two different places on one phone screen. Use a
+     stable two-column row: the explanation owns the left column and the control
+     stays on the right. Segments get the full row so their labels remain readable. */
+  #settingsModalBack .setRow{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:var(--s2) var(--s3);
+    flex-wrap:nowrap;
+  }
+  #settingsModalBack .setRow > div:first-child{min-width:0;}
+  #settingsModalBack .setRow > :is(input[type="checkbox"],input[type="color"],button){
+    grid-column:2;
+    grid-row:1;
+    margin:0;
+  }
+  #settingsModalBack .setRow > .seg{
+    grid-column:1 / -1;
+    grid-row:2;
+    width:100%;
+    min-width:0;
+  }
+  #settingsModalBack .setRow > .seg button{
+    flex:1 1 0;
+    min-width:0;
+    padding-inline:var(--s2);
+  }
 }
 
 /* Expanded guidance reads as a paragraph, not an indented card. */

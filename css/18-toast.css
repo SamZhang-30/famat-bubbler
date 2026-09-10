@@ -143,6 +143,7 @@
       min-height: 24px;
       padding: 0 var(--s3);
       font-size: 11.5px;
+      touch-action: manipulation;
     }
 
     /* Where the blocked-PDF chip has just taken you. Long enough to find with the
@@ -293,4 +294,3 @@
       background: transparent;
     }
     .selBtn:disabled:hover{ background: transparent; }
-

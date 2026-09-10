@@ -329,6 +329,28 @@
       // ---------- setup bar: one menu open at a time, click-away to close ----------
       const setupDetails = () => document.querySelectorAll(".setupBar > details");
 
+      /* iOS clips fixed descendants of a momentum-scrolling element. The setup
+         strip is intentionally a horizontal scroller, so an open menu can disappear
+         behind the page content on an iPhone. Portal the open body to <body> while
+         keeping its owner <details> in the setup bar. */
+      const menuBody = (d) => d?._fbMenuBody || d?.querySelector(".topSectionBody");
+      function portalMenu(d){
+        const body = menuBody(d);
+        if (!body || body.parentNode === document.body) return body;
+        d._fbMenuBody = body;
+        body.dataset.menuOwner = d.id;
+        body.dataset.portaled = "1";
+        document.body.appendChild(body);
+        return body;
+      }
+      function unportalMenu(d){
+        const body = menuBody(d);
+        if (!body || body.parentNode === d) return body;
+        d.appendChild(body);
+        delete body.dataset.portaled;
+        return body;
+      }
+
       // Every menu opens down from its own summary and rightward from its left edge.
       // That is the default and the only thing the width can take away: the box is
       // pulled left just far enough to stay on screen, and never flipped to hang off
@@ -338,7 +360,7 @@
       // The body is position:fixed, because the bar it lives in scrolls sideways and
       // would otherwise clip it — so both coordinates are set here rather than by CSS.
       function fitMenu(d){
-        const body = d.querySelector(".topSectionBody");
+        const body = menuBody(d);
         const summaryEl = d.querySelector("summary");
         if (!body || !summaryEl) return;
 
@@ -376,6 +398,7 @@
       function openMenuPlaced(d){
         setupDetails().forEach((o) => { if (o !== d) closeMenu(o); });
         d.open = true;
+        portalMenu(d);
         fitMenu(d);
         // An opened menu that is scrolled off the side of the bar has no visible
         // trigger, so bring its summary into the bar before pinning the body to it.
@@ -384,10 +407,11 @@
       }
 
       function closeMenu(d){
+        unportalMenu(d);
         d.open = false;
         // Next time it opens it has to be placed again before it may be seen. Without
         // this, a menu opened after the window moved would flash at its old spot.
-        d.querySelector(".topSectionBody")?.removeAttribute("data-placed");
+        menuBody(d)?.removeAttribute("data-placed");
       }
 
       /* Clicking a summary is the ordinary way in, and the one that used to flicker:
@@ -411,10 +435,12 @@
       setupDetails().forEach((d) => {
         d.addEventListener("toggle", () => {
           if (!d.open){
-            d.querySelector(".topSectionBody")?.removeAttribute("data-placed");
+            unportalMenu(d);
+            menuBody(d)?.removeAttribute("data-placed");
             return;
           }
           setupDetails().forEach((o) => { if (o !== d) closeMenu(o); });
+          portalMenu(d);
           fitMenu(d);
           d.scrollIntoView({ block: "nearest", inline: "nearest" });
           fitMenu(d);
@@ -450,7 +476,7 @@
         if (!ev.target.closest) return;
         closeSlipAdvanced(ev.target);
         // the info bubble is rendered on <body>, but belongs to whatever menu opened it
-        if (ev.target.closest(".setupBar") || ev.target.closest(".infoBubble")) return;
+        if (ev.target.closest(".setupBar") || ev.target.closest(".topSectionBody") || ev.target.closest(".infoBubble")) return;
         setupDetails().forEach((d) => { d.open = false; });
       });
 
@@ -526,6 +552,32 @@
       document.body.appendChild(bubble);
       let bubbleOwner = null;
       let bubblePinned = false;
+      let issueTouchAt = 0;
+
+      /* iOS Safari can miss a later document-level click for buttons inserted into
+         a fixed, scrollable bubble. Handle the redirect where the button lives on
+         touch, and suppress the synthetic click that follows it. Mouse and keyboard
+         activation still use the normal delegated handler. */
+      const activateIssueButton = (ev) => {
+        const btn = ev.target?.closest?.('[data-action="goToIssue"]');
+        if (!btn) return false;
+        ev.preventDefault();
+        ev.stopPropagation();
+        goToIssue(String(btn.dataset.issue || ""));
+        return true;
+      };
+      bubble.addEventListener("touchend", (ev) => {
+        if (!activateIssueButton(ev)) return;
+        issueTouchAt = Date.now();
+      }, { passive: false });
+      bubble.addEventListener("click", (ev) => {
+        if (Date.now() - issueTouchAt < 700){
+          const btn = ev.target?.closest?.('[data-action="goToIssue"]');
+          if (btn){ ev.preventDefault(); ev.stopPropagation(); }
+          return;
+        }
+        activateIssueButton(ev);
+      });
 
       function positionBubble(tip, html, kind){
         const markup = (html != null) ? html : (tip._html || "");
@@ -737,7 +789,7 @@
         body.querySelectorAll(":scope > .tabPanel").forEach((panel) => {
           panel.hidden = (panel.id !== btn.dataset.tab);
         });
-        const menu = body.closest("details");
+        const menu = body.closest("details") || (body.dataset.menuOwner && document.getElementById(body.dataset.menuOwner));
         if (menu && menu.open) fitMenu(menu);
         syncAddStudentForm();
       }
@@ -755,11 +807,11 @@
         if (!menu) return;
         setupDetails().forEach((d) => { d.open = (d === menu); });
         if (tabId){
-          const btn = menu.querySelector(`.tabBtn[data-tab="${tabId}"]`);
+          const btn = menuBody(menu)?.querySelector(`.tabBtn[data-tab="${tabId}"]`);
           if (btn) selectTab(btn);
         }
         fitMenu(menu);
-        const focusable = menu.querySelector(".tabPanel:not([hidden]) textarea, .tabPanel:not([hidden]) input, textarea, input");
+        const focusable = menuBody(menu)?.querySelector(".tabPanel:not([hidden]) textarea, .tabPanel:not([hidden]) input, textarea, input");
         if (focusable) focusable.focus();
       }
 

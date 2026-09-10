@@ -113,7 +113,8 @@
       border-radius: var(--r-lg);
       box-shadow: var(--shadow);
     }
-    #menuPdfSetup > .topSectionBody{ width: min(530px, 92vw); }
+    #menuPdfSetup > .topSectionBody,
+    .topSectionBody[data-menu-owner="menuPdfSetup"]{ width: min(530px, 92vw); }
 
     /* A closed <details> hides its non-summary children on its own; saying so out loud
        costs nothing and keeps the rule explicit. */
