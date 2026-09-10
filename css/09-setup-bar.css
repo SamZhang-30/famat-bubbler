@@ -113,6 +113,12 @@
       border-radius: var(--r-lg);
       box-shadow: var(--shadow);
     }
+    /* Portaled bodies are direct children of <body>, so they no longer inherit the
+       page header's z-index stacking context. Keep ordinary bodies at 45, but put an
+       open portaled body just above the header (46) so its rounded top edge is not
+       painted underneath the header's bottom border on iOS. It remains below the
+       fixed action bar at 50. */
+    .topSectionBody[data-portaled="1"]{ z-index: 47; }
     #menuPdfSetup > .topSectionBody,
     .topSectionBody[data-menu-owner="menuPdfSetup"]{ width: min(530px, 92vw); }
 
