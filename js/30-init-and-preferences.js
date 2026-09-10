@@ -80,13 +80,6 @@
         document.querySelectorAll("[data-div-color]").forEach((el) => {
           el.value = P.divColor(el.dataset.divColor);
         });
-        const btn = document.getElementById("btnTheme");
-        if (btn){
-          const toDark = document.documentElement.dataset.theme === "light";
-          const label = toDark ? "Switch to dark mode" : "Switch to light mode";
-          btn.title = label;
-          btn.setAttribute("aria-label", label);
-        }
       }
 
       function openSettings(){
@@ -132,12 +125,6 @@
           toast("Preferences reset to defaults");
           return;
         }
-        if (action === "toggleTheme"){
-          P.set("theme", document.documentElement.dataset.theme === "light" ? "dark" : "light");
-          syncSettingsUI();
-          return;
-        }
-
         const segBtn = ev.target.closest && ev.target.closest("[data-pref-seg] button[data-val]");
         if (segBtn){
           P.set(segBtn.closest("[data-pref-seg]").dataset.prefSeg, segBtn.dataset.val);
@@ -1095,6 +1082,17 @@
         };
         document.addEventListener("DOMContentLoaded", observeSticky);
         observeSticky();
+        /* Rendering the empty-state card and rendering the table can change the
+           panel's intrinsic layout without changing any sticky band above it. Watch
+           that subtree so the anchored window is recalculated immediately instead
+           of retaining the first empty-state measurement until a refresh. */
+        const listRoot = document.getElementById("studentsRoot");
+        if (listRoot && window.MutationObserver){
+          const listMo = new MutationObserver(() => {
+            requestAnimationFrame(measureStickyOffsets);
+          });
+          listMo.observe(listRoot, { childList: true, subtree: true });
+        }
       }
       /* The page header pins or unpins with its preference, which changes what it
          takes off the top; the column headings do the same with theirs, and their

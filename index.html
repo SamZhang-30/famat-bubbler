@@ -56,20 +56,18 @@
       <div class="appHeaderLeft">
         <div>
           <h1 class="appTitle">Enhanced FAMAT Bubbler</h1>
-          <div class="smallNote"><a href="help.html" target="_blank" rel="noopener">How to Use</a> <span id="saveStatus" role="status" aria-live="polite"></span></div>
+          <div class="smallNote"><span id="saveStatus" role="status" aria-live="polite"></span></div>
         </div>
       </div>
       <div class="row">
         <button type="button" class="iconBtn" data-action="openShortcuts" title="Keyboard shortcuts" aria-label="Keyboard Shortcuts">
           <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="1.2" y="3.6" width="13.6" height="8.8" rx="1.8"/><path d="M4.2 6.4h.01M6.6 6.4h.01M9 6.4h.01M11.4 6.4h.01M4.2 9.6h6.8"/></svg>
         </button>
-        <button type="button" class="iconBtn" data-action="toggleTheme" id="btnTheme" title="Switch between light and dark" aria-label="Switch between light and dark">
-          <svg class="glyph icon-sun" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="3.1"/><path d="M8 1.4v1.5M8 13.1v1.5M2.7 8H1.2M14.8 8h-1.5M3.9 3.9l1.1 1.1M11 11l1.1 1.1M12.1 3.9 11 5M5 11l-1.1 1.1"/></svg>
-          <svg class="glyph icon-moon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M13.6 9.9A5.9 5.9 0 1 1 6.1 2.4a5 5 0 0 0 7.5 7.5z"/></svg>
-        </button>
+        <a class="iconBtn" href="help.html" target="_blank" rel="noopener" title="How to Use" aria-label="How to Use">
+          <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.2"/><path d="M6.2 6.1a1.9 1.9 0 1 1 3.3 1.3c-.8.7-1.5 1-1.5 2.1"/><path d="M8 11.8h.01"/></svg>
+        </a>
         <button type="button" class="iconBtn" data-action="openSettings" title="Settings" aria-label="Settings">
-          <!-- a toothed gear, not a circle with spokes: the spoked version was
-               indistinguishable from the sun in the theme button beside it -->
+          <!-- a toothed gear, kept distinct from the help icon beside it -->
           <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6.45 3.51L6.79 1.77L9.21 1.77L9.55 3.51L10.08 3.73L11.55 2.74L13.26 4.45L12.27 5.92L12.49 6.45L14.23 6.79L14.23 9.21L12.49 9.55L12.27 10.08L13.26 11.55L11.55 13.26L10.08 12.27L9.55 12.49L9.21 14.23L6.79 14.23L6.45 12.49L5.92 12.27L4.45 13.26L2.74 11.55L3.73 10.08L3.51 9.55L1.77 9.21L1.77 6.79L3.51 6.45L3.73 5.92L2.74 4.45L4.45 2.74L5.92 3.73Z"/><circle cx="8" cy="8" r="2.15"/></svg>
         </button>
       </div>
@@ -555,10 +553,10 @@
         <div class="listBar">
           <div class="row listBarLeft" style="gap:10px;">
             <h3 id="listTitle" style="font-size:15px;">Student List</h3>
-            <div class="seg" id="viewSeg" role="group" aria-label="How to show the student list">
-              <button type="button" data-action="setListView" data-listview="table" data-on="1" title="One table, in printing order">Table</button>
-              <button type="button" data-action="setListView" data-listview="summary" data-on="0" title="Counts by division">Summary</button>
-            </div>
+          </div>
+          <div class="seg" id="viewSeg" role="group" aria-label="How to show the student list">
+            <button type="button" data-action="setListView" data-listview="table" data-on="1" title="One table, in printing order">Table</button>
+            <button type="button" data-action="setListView" data-listview="summary" data-on="0" title="Counts by division">Summary</button>
           </div>
         </div>
 

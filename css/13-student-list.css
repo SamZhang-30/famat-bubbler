@@ -242,6 +242,8 @@
       background: var(--panel);
       border-bottom: 1px solid var(--line2);
     }
+    .listBarLeft{ min-width: 0; }
+    .listBar > #viewSeg{ margin-left: auto; flex: 0 0 auto; }
     /* The bar above the table. The search takes whatever the buttons do not, and keeps
        taking it down to nothing rather than pushing them onto a second line — two 28px
        buttons and a gap is all they ever need, and a search box narrower than its own
@@ -411,11 +413,11 @@
       --wDiv: calc(117px + (var(--rowPadY) - 4px));
       /* Sized backwards from the ID box rather than picked: the box fills the cell, so
          its width is this minus the cell's padding on both sides and the column rule.
-         Holding it at 81px lands between the eight-slot run it used to hug and the full
-         96px column it grew to. The padding term is what keeps the box a constant width
+         Holding it at 95px leaves a little breathing room around the eight-slot run on
+         a phone, where fixed-width monospace digits need more room. The padding term keeps the box a constant width
          while the inset around it grows with density — the digits are the same size at
          every density, so it is the column that should give, not them. */
-      --wId:   calc(90px + (var(--rowPadY) - 4px) * 2);
+      --wId:   calc(104px + (var(--rowPadY) - 4px) * 2);
       --wTeam: 62px;
       --wInc:  62px;   /* "Added" measures 42px, so it sits in a Team-sized column */
 
@@ -592,4 +594,3 @@
     #studentsRoot td.teamCol,
     #studentsRoot td.incCol{ line-height: 0; }
     #studentsRoot th.idCol{ text-align: center; padding-left: var(--s1); padding-right: var(--s1); }
-

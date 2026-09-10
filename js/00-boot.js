@@ -1,5 +1,22 @@
     /* Boot: safe storage + user preferences applied before first paint. */
     (function(){
+      /* iOS Safari enlarges the whole page when focusing a small form control. This
+         app uses fixed pinned bands and anchored scrollers, so that reflow makes the
+         controls unusable. Limit the automatic focus zoom on iOS only; modern iOS
+         still permits pinch zoom, and Android keeps its normal zoom behavior. */
+      try{
+        var ua = navigator.userAgent || "";
+        var isiOS = /iPad|iPhone|iPod/.test(ua)
+          || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        var viewport = document.querySelector('meta[name="viewport"]');
+        if (isiOS && viewport){
+          var content = viewport.getAttribute("content") || "";
+          if (!/maximum-scale\s*=/.test(content)){
+            viewport.setAttribute("content", content + ", maximum-scale=1");
+          }
+        }
+      }catch(_){ }
+
       try{ window.localStorage.getItem("__fb_probe__"); }
       catch(e){
         window.FBStorageVolatile = true;

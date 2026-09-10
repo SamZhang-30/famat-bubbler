@@ -463,6 +463,7 @@
         }
         const named = String(row.querySelector(".topicInput")?.value || "").trim();
         badge.innerHTML = PERSON_GLYPH + `<span data-topic-count>${n}</span>`;
+        badge.dataset.empty = n === 0 ? "1" : "0";
         badge.title = `${n} added ${n === 1 ? "student is" : "students are"} sitting `
           + `${named ? `"${named}"` : "this test"}. Deleting it returns them to `
           + (tbdOn ? "their own division's TBD." : "no topic test at all.");

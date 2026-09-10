@@ -3,6 +3,7 @@
 .personGlyph{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
 .badge:has(.personGlyph){display:inline-flex;align-items:center;gap:5px;}
 .topicUse{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:45px;height:var(--h-sm);padding:0 6px;border-radius:var(--r-sm);border:1px solid var(--line2);font-size:12px;box-sizing:border-box;}
+.topicUse[data-empty="1"]{color:var(--muted);border-color:var(--line);background:transparent;opacity:.42;}
 .topicRow input.topicInput,.topicRow input.topicCodeInput{height:var(--h-sm);border-radius:var(--r-sm);}
 .topicRow .topicUse{order:0;}
 .topicRow .topicInput{order:1;}
@@ -47,9 +48,12 @@ html[data-generating="1"] .progressBar{flex:1;min-width:20px;}
   #saveStatus{display:block;margin:3px 0 0;max-width:190px;}
   html[data-generating="1"] .stickyInner{flex-wrap:nowrap;}
   html[data-generating="1"] .stickyRight{display:none;}
-  .topicRow{flex-wrap:wrap;}
-  .topicRow .topicInput{flex-basis:calc(100% - 112px);}
-  .topicRow .topicRowActs{margin-left:auto;}
+  /* The name, code and three row actions fit in one compact line on a phone when
+     the name is allowed to take the remaining space. Wrapping the actions created a
+     second line and made every test row much taller than its actual contents. */
+  .topicRow{flex-wrap:nowrap;}
+  .topicRow .topicInput{flex:1 1 0;}
+  .topicRow .topicRowActs{margin-left:0;}
   .modalBack{padding:12px;}
   .modal{max-height:calc(100dvh - 24px);}
 }

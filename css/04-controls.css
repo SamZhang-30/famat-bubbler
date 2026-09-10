@@ -68,11 +68,22 @@
 
     /* icon-only button in the app header */
     .iconBtn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: var(--h-md);
       min-height: var(--h-md);
       padding: 0;
+      background: var(--btn);
+      color: var(--text);
+      border: 1px solid var(--line2);
       border-radius: var(--r-pill);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 90ms ease, border-color 90ms ease;
     }
+    .iconBtn:hover{ background: var(--btnHover); text-decoration: none; }
+    .iconBtn:focus-visible{ box-shadow: var(--focusRing); }
     .glyph{
       width: 16px;
       height: 16px;
@@ -83,7 +94,3 @@
       stroke-linecap: round;
       stroke-linejoin: round;
     }
-    /* the icon shows the mode you would switch to */
-    html[data-theme="dark"]  .icon-moon,
-    html[data-theme="light"] .icon-sun{ display: none; }
-

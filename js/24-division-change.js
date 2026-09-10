@@ -137,6 +137,8 @@
     function renderTopicTestGrid(cfgOverride){
       const host = document.getElementById("topicTestGrid");
       if (!host) return;
+      const scrollHost = host.closest(".topSectionBody");
+      const savedScrollTop = scrollHost ? scrollHost.scrollTop : 0;
       // Read before clearing: with no override the config comes out of these very
       // inputs, and emptying the host first hands it a grid with nothing in it.
       const cfg = cfgOverride || getTopicTestConfig();
@@ -200,10 +202,10 @@
               + `${named ? `"${named}"` : "this test"}. Deleting it returns ${seated === 1 ? "them" : "them"} to `
               + (cfg.tbdEnabled ? "their own division's TBD." : "no topic test at all.")
             : "";
-          row.innerHTML = `<span class="topicUse" title="${seated} added students assigned to this test">${PERSON_GLYPH}<span data-topic-count>${seated}</span></span>`
+          row.innerHTML = `<span class="topicUse" data-empty="${seated ? "0" : "1"}" title="${seated} added students assigned to this test">${PERSON_GLYPH}<span data-topic-count>${seated}</span></span>`
             + `<input type="text" class="topicInput" data-group="${escAttr(g)}" data-index="${idx}" value="${escAttr(existing[i] ?? "")}" placeholder="Test name">`
             + `<input type="text" class="topicCodeInput" inputmode="numeric" data-group="${escAttr(g)}" data-index="${idx}" value="${escAttr(existingCodes[i] ?? "")}" maxlength="3" placeholder="###" title="Optional. Three digits, bubbled on the sheet.">`
-            
+
             + `<span class="topicRowActs">`
               + `<button type="button" class="topicRowBtn" data-action="moveTopicTest" data-group="${escAttr(g)}" data-index="${idx}" data-dir="-1"`
               + `${idx === 1 ? " disabled" : ""} aria-label="Move up" title="Move this test up the list">${ICON_TOPIC_UP}</button>`
@@ -233,7 +235,7 @@
           const tbdUseTitle = tbdSeated
             ? `${tbdSeated} added ${tbdSeated === 1 ? "student is" : "students are"} on this division's TBD.`
             : "";
-          tbdRow.innerHTML = `<span class="topicUse">${PERSON_GLYPH}<span data-topic-count>${tbdSeated}</span></span>`
+          tbdRow.innerHTML = `<span class="topicUse" data-empty="${tbdSeated ? "0" : "1"}">${PERSON_GLYPH}<span data-topic-count>${tbdSeated}</span></span>`
             + `<span class="topicTbdName">TBD</span>`
             + `<span class="topicTbdNote">prints the prefix alone</span>`
             ;
@@ -260,6 +262,10 @@
         host.appendChild(card);
       }
       syncTopicCodeState();
+      if (scrollHost){
+        scrollHost.scrollTop = savedScrollTop;
+        requestAnimationFrame(() => { scrollHost.scrollTop = savedScrollTop; });
+      }
     }
 
     /**
@@ -525,4 +531,3 @@
       syncAllCountersAndSummaries();
       syncSticky();
     }
-

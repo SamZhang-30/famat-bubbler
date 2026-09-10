@@ -166,6 +166,7 @@
       .appHeader{ flex-wrap: nowrap; gap: var(--s2); }
       .appHeaderLeft{ min-width: 0; }
       .appTitle{ font-size: 15px; }
+      .appHeaderLeft .smallNote{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .appHeader .row{ flex: 0 0 auto; flex-wrap: nowrap; }
 
       /* The sticky footer is the one band that must never wrap: Create PDF is the
