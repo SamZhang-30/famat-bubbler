@@ -22,6 +22,7 @@
       const restored = loadCurrent();
       if (restored){
         applyFullSnapshot(restored,{persist:false});
+        storageNotice("Saved in this browser");
       } else {
         // Browsers can restore text controls across reloads independently of storage.
         // With no saved workspace, a restored school prefix must not become a setting.
@@ -36,6 +37,7 @@
         undoStack.length = 0;
         redoStack.length = 0;
         persistUndoState();
+        storageNotice("No changes made yet");
       }
       syncUndoUI();
 
@@ -360,13 +362,28 @@
         const maxLeft = Math.max(margin, window.innerWidth - width - margin);
         const left = Math.min(Math.max(summary.left, margin), maxLeft);
 
-        const top = Math.round(summary.bottom + gap);
-        body.style.left = Math.round(left) + "px";
+        /* Safari's keyboard changes the visual viewport and may scroll the page to
+           keep a focused textarea near the keyboard. A fixed menu must not follow
+           that scroll above the visible screen, so keep its top edge in the current
+           viewport while retaining the summary anchor whenever there is room. */
+        const viewport = window.visualViewport;
+        const viewportWidth = viewport ? viewport.width : window.innerWidth;
+        const viewportTop = viewport ? viewport.offsetTop : 0;
+        const viewportHeight = viewport ? viewport.height : window.innerHeight;
+        const minTop = viewportTop + margin;
+        const maxTop = Math.max(minTop,
+          viewportTop + viewportHeight - stickyBarHeight() - margin - 160);
+        const top = Math.round(Math.min(Math.max(summary.bottom + gap, minTop), maxTop));
+        const mobileCenter = viewportWidth <= 620;
+        const finalLeft = mobileCenter
+          ? Math.max(margin, (viewportWidth - width) / 2)
+          : left;
+        body.style.left = Math.round(finalLeft) + "px";
         body.style.right = "auto";
         body.style.top = top + "px";
         // The CSS ceiling assumes the pinned header; an unpinned one can sit anywhere
         // down the page, so the room left below the summary is what actually caps it.
-        const roomBelow = window.innerHeight - top - stickyBarHeight() - margin;
+        const roomBelow = viewportTop + viewportHeight - top - stickyBarHeight() - margin;
         body.style.maxHeight = Math.max(160, Math.round(roomBelow)) + "px";
         // it has a real position now, so it is allowed to be seen
         body.dataset.placed = "1";
@@ -391,6 +408,8 @@
         // trigger, so bring its summary into the bar before pinning the body to it.
         d.scrollIntoView({ block: "nearest", inline: "nearest" });
         fitMenu(d);
+        window.FBSyncScrollFades?.();
+        requestAnimationFrame(() => window.FBSyncScrollFades?.());
       }
 
       function closeMenu(d){
@@ -431,9 +450,15 @@
           fitMenu(d);
           d.scrollIntoView({ block: "nearest", inline: "nearest" });
           fitMenu(d);
+          window.FBSyncScrollFades?.();
+          requestAnimationFrame(() => window.FBSyncScrollFades?.());
         });
       });
       window.addEventListener("resize", refitOpenMenus);
+      if (window.visualViewport){
+        window.visualViewport.addEventListener("resize", refitOpenMenus, { passive: true });
+        window.visualViewport.addEventListener("scroll", refitOpenMenus, { passive: true });
+      }
       // A fixed body does not travel with its summary on its own: the page scrolling
       // under an unpinned header, or the bar scrolling sideways, both move one and
       // not the other.
@@ -777,7 +802,11 @@
           panel.hidden = (panel.id !== btn.dataset.tab);
         });
         const menu = body.closest("details") || (body.dataset.menuOwner && document.getElementById(body.dataset.menuOwner));
-        if (menu && menu.open) fitMenu(menu);
+        if (menu && menu.open){
+          fitMenu(menu);
+          window.FBSyncScrollFades?.();
+          requestAnimationFrame(() => window.FBSyncScrollFades?.());
+        }
         syncAddStudentForm();
       }
 
@@ -798,6 +827,8 @@
           if (btn) selectTab(btn);
         }
         fitMenu(menu);
+        window.FBSyncScrollFades?.();
+        requestAnimationFrame(() => window.FBSyncScrollFades?.());
         const focusable = menuBody(menu)?.querySelector(".tabPanel:not([hidden]) textarea, .tabPanel:not([hidden]) input, textarea, input");
         if (focusable) focusable.focus();
       }

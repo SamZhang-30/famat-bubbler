@@ -616,6 +616,9 @@
       const probe = document.getElementById("divWidthProbe");
       const th    = root?.querySelector("th.divCol");
       if (!root || !probe || !th) return;
+      const rootStyle = getComputedStyle(root);
+      const rowPad = parseFloat(rootStyle.getPropertyValue("--rowPadY")) || 4;
+      const minW = 117 + (rowPad - 4);
 
       /* Border box, because that is what a <col> width is under table-layout: fixed.
          The column rule is the cell's own border-left and lives inside that width,
@@ -650,7 +653,7 @@
       const forHead  = rule + padL + headW  + DIV_COL_HEAD_AIR + padR;
       const forPills = rule + padL + widest + padL;
 
-      const w = Math.min(DIV_COL_MAX, Math.max(forHead, forPills));
+      const w = Math.min(DIV_COL_MAX, Math.max(minW, forHead, forPills));
       root.style.setProperty("--wDiv", Math.ceil(w) + "px");
     }
     /** Roster divisions that land in one group, in roster order. */

@@ -223,4 +223,4 @@
       font-weight: 800;
       letter-spacing: 0.2px;
     }
-    .appHeader .smallNote{ margin-top: 2px; }
+    .appHeader .smallNote{ margin-top: 0; line-height: 1.15; }

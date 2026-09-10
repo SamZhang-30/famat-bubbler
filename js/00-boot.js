@@ -50,7 +50,7 @@
         density: "compact",     // compact | cozy | comfortable
         width: "wide",          // standard | wide | full
         accent: "#7aa2ff",
-        help: "hover",   // hover | on | off
+        help: "on",      // on | off
         stickyHead: true,
         stickyTop: true,        // pin the page header (title, competition, setup bar)
         colSel: true,
@@ -153,8 +153,9 @@
       }catch(e){}
       // The old pref was a boolean. `false` was a deliberate "hide it" and is kept as "off";
       // `true` was only ever the old default, so it moves to the new default of hover chips.
-      if (typeof prefs.help === "boolean") prefs.help = prefs.help ? "hover" : "off";
-      if (["hover","on","off"].indexOf(prefs.help) < 0) prefs.help = "hover";
+      if (typeof prefs.help === "boolean") prefs.help = prefs.help ? "on" : "off";
+      if (prefs.help === "hover") prefs.help = "on";
+      if (["on","off"].indexOf(prefs.help) < 0) prefs.help = "on";
       if (["soft","normal","strong"].indexOf(prefs.tintStrength) < 0) prefs.tintStrength = "normal";
 
       function resolvedTheme(){

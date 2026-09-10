@@ -23,7 +23,7 @@
 .textLink{padding:0;min-height:0;background:none;border:0;color:var(--accent);text-decoration:underline;font:inherit;}
 .resetWorkspace{display:flex;flex-direction:column;align-items:flex-start;gap:10px;}
 .resetWorkspace p{font-size:12px;color:var(--muted);margin:0;}
-#saveStatus{font-size:11px;color:var(--muted);margin-left:8px;}
+#saveStatus{font-size:11px;color:var(--muted);margin-left:8px;line-height:1.15;}
 #saveStatus[data-error="1"]{color:var(--danger);}
 .sortTh .sortLabel{min-height:0;border:0;background:none;padding:0;border-radius:0;color:inherit;font:inherit;letter-spacing:inherit;text-transform:inherit;}
 .advBody{position:fixed;margin:0;z-index:100;max-height:calc(100dvh - 32px);overflow:auto;}
@@ -45,7 +45,7 @@ html[data-generating="1"] .progressBar{flex:1;min-width:20px;}
   .stickyRight{flex:0 0 auto;}
   #stickyStats{display:none;}
   #btnCreateSticky{font-size:12px;padding-inline:10px;}
-  #saveStatus{display:block;margin:3px 0 0;max-width:190px;}
+  #saveStatus{display:block;margin:0;max-width:190px;}
   html[data-generating="1"] .stickyInner{flex-wrap:nowrap;}
   html[data-generating="1"] .stickyRight{display:none;}
   /* The name, code and three row actions fit in one compact line on a phone when

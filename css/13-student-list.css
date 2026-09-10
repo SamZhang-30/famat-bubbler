@@ -410,7 +410,8 @@
          not, so the column has to give or "Precalculus" loses its tail on the roomier
          settings. 117px is the compact figure; the term adds back exactly what the
          wider inset takes. */
-      --wDiv: calc(117px + (var(--rowPadY) - 4px));
+      --wDivMin: calc(117px + (var(--rowPadY) - 4px));
+      --wDiv: var(--wDivMin);
       /* Sized backwards from the ID box rather than picked: the box fills the cell, so
          its width is this minus the cell's padding on both sides and the column rule.
          Holding it at 95px leaves a little breathing room around the eight-slot run on

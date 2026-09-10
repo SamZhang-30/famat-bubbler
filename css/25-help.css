@@ -108,32 +108,10 @@
     .infoBubble p{ margin: 0 0 var(--s2); color: inherit; }
     .infoBubble p:last-child{ margin-bottom: 0; }
 
-    /* Always-on help.
-       Inline, the note's six sections used to stack into a column of paragraphs tall
-       enough to push the table clean off an 860px screen. Set as a grid they read as
-       what they are — a short glossary of the columns — and take three rows instead
-       of twelve. In the default hover mode none of this applies: the note is hidden
-       and only its chip shows. */
-    html[data-help="on"] #listNote{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 0 var(--s4);
-      margin: 0;
-      padding: var(--s3);
-      border: 1px solid var(--line2);
-      border-radius: var(--r-md);
-      background: var(--panel2);
-    }
-    /* each heading starts a new grid cell, and its paragraph sits under it */
-    html[data-help="on"] #listNote .tipSection{ margin: 0 0 2px; grid-column: auto; }
-    html[data-help="on"] #listNote p{ margin: 0 0 var(--s3); }
-
-
-    /* help mode: hover chips (default), always-on prose, or nothing */
-    html[data-help="hover"] div.smallNote,
-    html[data-help="hover"] p.smallNote{ display: none; }
-    html[data-help="hover"] .infoTip{ display: inline-flex; }
-    html[data-help="on"] .infoTip{ display: none; }
+    /* help mode: compact guidance on, or no guidance */
+    html[data-help="on"] div.smallNote,
+    html[data-help="on"] p.smallNote{ display: none; }
+    html[data-help="on"] .infoTip{ display: inline-flex; }
     html[data-help="off"] div.smallNote,
     html[data-help="off"] p.smallNote{ display: none; }
     html[data-help="off"] .helpDisclosure{ display: none; }
@@ -143,4 +121,3 @@
     .modal .smallNote,
     .emptyState .smallNote,
     .appHeader .smallNote{ display: block !important; }
-

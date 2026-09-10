@@ -34,4 +34,20 @@
 <p>Search and Filter stay visible even when no rows match. Clear Search and Clear Filters work independently. On phones, scroll the table sideways to reach each separate column. Division, First, Last and Test retain their own sorting controls.</p>
 <p>Use Tab to move through controls. Dialogs keep focus inside and Escape closes the top dialog. Arrow keys switch menu tabs. Focus a row’s reorder handle and use Alt+↑ or Alt+↓ to move it. The keyboard shortcuts dialog lists the available batch actions.</p>
 <aside><strong>Before a meet:</strong> check the competition rules and template version, inspect a sample PDF, and verify actual printer and scanner output at the intended print scale.</aside>
+<script>
+(function(){
+  if (new URLSearchParams(location.search).get("from") !== "app") return;
+  /* A help tab opened from the app has no useful page to return to. Add one
+     same-document history step so Safari's Back gesture can close the tab; if the
+     browser refuses window.close(), leave the reader at the app instead. */
+  history.replaceState({helpRoot:true}, "", location.href);
+  history.pushState({helpExit:true}, "", location.href.split("#")[0] + "#help");
+  window.addEventListener("popstate", function(){
+    window.close();
+    window.setTimeout(function(){
+      if (!document.hidden) location.replace("index.html");
+    }, 180);
+  });
+})();
+</script>
 </body></html>
