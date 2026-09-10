@@ -1,0 +1,159 @@
+    /* ============================================================
+       FAMAT Bubbler — one design system.
+
+       Tokens first, components second, preference-driven rules last.
+       Every radius comes from the four-step scale; every gap and pad
+       comes from the six-step spacing scale. Nothing is redefined
+       later in the file to undo something set earlier.
+       ============================================================ */
+
+    :root{
+      /* --- surfaces (dark is the base; the light block swaps these) --- */
+      --bg:        #0f1115;
+      --panel:     #141823;
+      --panel2:    #10141d;
+      --panel3:    #191e2b;   /* one step above --panel: menus, modals, popovers */
+      --text:      #e8eaf0;
+      --muted:     #a7afc0;
+      --line:      rgba(255,255,255,0.12);
+      --line2:     rgba(255,255,255,0.07);
+      --btn:       #1d2333;
+      --btnHover:  #262e43;
+      --thBg:      #171c27;
+      --tint:       rgba(255,255,255,0.035);
+      --tintStrong: rgba(255,255,255,0.07);
+      --off:       #262b36;
+      --offText:   rgba(232,234,240,0.74);
+      --shadow:    0 18px 44px rgba(0,0,0,0.42);
+
+      /* --- accent + status --- */
+      --accent: #7aa2ff;
+      --ok:     #5ddc8a;
+      --warn:   rgba(255, 210, 120, 0.92);
+      --danger: rgba(255, 120, 120, 0.88);
+
+      /* --- division palette (overwritten per-preference by the boot script) --- */
+      --div1: #ffd6a5;  /* Algebra I */
+      --div2: #b9fbc0;  /* Geometry */
+      --div3: #bde0fe;  /* Algebra II — Theta */
+      --div4: #ffc6ff;  /* Precalculus — Alpha */
+      --div5: #fff3b0;  /* Calculus — Mu */
+      --div6: #beb0e8;  /* Statistics — Open */
+      /* Fallback only: apply() overwrites --div0 from DIV_GRAY on the first paint.
+         Kept in step with it so the two can never disagree if script is slow. */
+      --div0: #c9cfdc;
+
+      /* --- radius scale ---
+         The scale was never the problem; the missing piece was a rule saying which
+         step a *role* gets. One row of the student list used to carry four different
+         treatments. The mapping below is the whole rule, and nothing may deviate:
+
+           something you type into  -> --r-md   (inputs, textareas, selects, buttons)
+           a state you toggle       -> --r-pill (badges, division pills, mini buttons)
+           a surface                -> --r-lg   (panels, modals, popovers, menu bodies)
+           a fragment inside a cell -> --r-sm   (code chips, swatches, key caps)
+
+         A box nested inside another box does not repeat the outer radius: it takes
+         the outer radius minus the gap between them, which is what --r-md-in is for
+         (10px outer, 3px pad). Equal radii pinch at the corner and read as wrong. */
+      --r-sm:    8px;   /* code chips, color swatches, key caps */
+      --r-md:   10px;   /* anything you type into, and every button that is not a pill */
+      --r-md-in: 7px;   /* --r-md minus a 3px inset: the segmented control's thumb */
+      --r-lg:   14px;   /* surfaces: panels, cards, popovers, modals, menu bodies */
+      --r-pill: 999px;  /* toggled state: badges, division pills, mini and icon buttons */
+
+      /* --- size scale ---
+         Radius and spacing were given scales and stayed consistent for three thousand
+         lines. Height was not, and drifted to eleven distinct values — six of them
+         inside a single table row, which is why a row read as a scatter rather than
+         as one line of a grid. Three steps for page chrome, and every control picks
+         one; nothing may invent a fourth. */
+      --h-xs: 24px;   /* the smallest labelled button: copy, facet all/none */
+      --h-sm: 28px;   /* toolbar and modal buttons, slot rows, in-menu fields */
+      --h-md: 34px;   /* page-level controls: header buttons, menu chips, search */
+      --h-lg: 40px;   /* the two primary actions: Competition and Create PDF */
+
+      /* The student list cannot take a fixed step: its density is a preference, and a
+         frozen height would ignore it. So the row gets one derived height instead —
+         the tallest thing a cell has ever needed, which is a text field — and every
+         control in the row is held to it at every density. One number per row, three
+         densities, no scatter. */
+      --h-row: calc(var(--rowFont) * 1.35 + 2 * (var(--rowPadY) + 1px));
+      /* A division pill is a label, not a control, so it does not have to fill the
+         row the way the buttons and fields around it do — and at full row height it
+         read as the heaviest thing on the line, which is backwards for something you
+         are not meant to click. Three quarters of the row: enough to stay a pill, and
+         because the radius is --r-pill the corners come down with the height. */
+      --h-pill: calc(var(--h-row) * 0.75);
+
+      /* --- spacing scale --- */
+      --s1: 4px;
+      --s2: 8px;
+      --s3: 12px;
+      --s4: 16px;
+      --s5: 24px;
+      --s6: 32px;
+
+      /* --- layout --- */
+      --wrapW:  1440px;
+      --stickyH: 62px;
+      /* Just the bar and a gap. The selection options are absolutely positioned above
+         it and are allowed to sit over the last rows — reserving page for them costs
+         every screen height in exchange for a case that is transient and self-evident.
+         The gap is the half of the list's bottom inset that its own var(--s3) margin
+         does not already cover: the two come to var(--s4), which is what the body
+         insets by on the left and right. .wrap's padding-top is the same pairing at
+         the top of the page. */
+      --stickyPad: calc(var(--stickyBarH, var(--stickyH)) + var(--s1));
+      --rowPadY: 4px;
+      --rowFont: 13px;
+      --ctlH: var(--h-md);   /* page-level control height — kept as an alias so the
+                                many call sites below read as intent, not as a number */
+      --tintScale: 1;        /* set by the boot script from the tint-strength preference */
+
+      /* The accent as ink on a surface, rather than as a fill behind one. On the dark
+         panel the accent itself reads fine; on light it is a pale blue that all but
+         disappears over a tinted row, so it is taken down toward the text color. */
+      --accentInk: var(--accent);
+      --focusRing: 0 0 0 3px color-mix(in srgb, var(--accent) 32%, transparent);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+
+    html[data-theme="light"]{
+      --bg:        #f5f7fb;
+      --panel:     #ffffff;
+      --panel2:    #f1f4fa;
+      --panel3:    #ffffff;
+      --text:      #131722;
+      --muted:     #55607a;
+      --line:      rgba(15,23,42,0.16);
+      --line2:     rgba(15,23,42,0.10);
+      --btn:       #eaeef6;
+      --btnHover:  #dee4f0;
+      --thBg:      #eceff7;
+      --tint:       rgba(15,23,42,0.035);
+      --tintStrong: rgba(15,23,42,0.07);
+      --off:       #e7ebf3;
+      --offText:   rgba(19,23,34,0.60);
+      --shadow:    0 18px 40px rgba(15,23,42,0.16);
+      --ok:     #14803c;
+      --warn:   #a8620a;
+      --danger: #b42318;
+      --div0:   #c9cfdc;
+      /* Not "the accent mixed with black" — that drains the chroma along with the
+         lightness and lands somewhere near the body text. Only the lightness is
+         pinned, so whatever accent is set keeps its own hue and saturation and stays
+         recognizably itself. The mix is the fallback for engines without relative
+         color syntax. */
+      --accentInk: color-mix(in oklab, var(--accent) 72%, #000);
+      --accentInk: oklch(from var(--accent) 0.55 c h);
+      color-scheme: light;
+    }
+
+    /* density and page width */
+    html[data-density="cozy"]{ --rowPadY: 7px; --rowFont: 13.5px; }
+    html[data-density="comfortable"]{ --rowPadY: 10px; --rowFont: 14px; }
+    html[data-width="standard"]{ --wrapW: 1080px; }
+    html[data-width="wide"]{ --wrapW: 1440px; }
+    html[data-width="full"]{ --wrapW: 100%; }
+

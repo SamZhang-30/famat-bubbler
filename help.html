@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>How to Use Enhanced FAMAT Bubbler</title>
+<style>
+:root{color-scheme:light dark;font:16px/1.65 system-ui,sans-serif}body{max-width:780px;margin:40px auto;padding:0 24px 60px}a{color:light-dark(#2454b8,#9bbcff)}h1,h2{line-height:1.25}h2{margin-top:32px}li{margin:10px 0}code{font-size:.95em}aside{border:1px solid #8888;border-radius:12px;padding:16px}nav{margin-bottom:28px}
+</style></head><body>
+<nav><a href="index.html">← Enhanced FAMAT Bubbler</a></nav>
+<h1>From Roster to Answer Sheets</h1>
+<p>Choose a competition, load students, mark who needs a sheet, then review and create the PDF. Your data stays in this browser. Download a backup before clearing browser data or moving to another device.</p>
+<h2>Why This Fork Exists</h2>
+<p><a href="https://anirudhrahul.github.io/FAMATBubbler/">The original FAMAT Bubbler</a>, created by Anirudh Rahul, established the core workflow of turning a FAMAT roster into bubbled answer sheets. Enhanced FAMAT Bubbler builds on that work for the broader setup, review and recovery needs that arise when preparing a full competition.</p>
+<p>This fork adds saved roster and draft slots, undo and backup recovery, competition presets and custom division mapping, topic tests, team tools, permission-slip matching, filtering and batch actions. It also provides a more visual interface with dark mode, adjustable density and columns, selectable PDF fonts, filename controls, higher-quality PDF rendering and a preview that warns when printed text will not fit.</p>
+<p>The original project deserves credit for the idea and working foundation. These additions refine and extend its workflow rather than replace that contribution.</p>
+<ol>
+<li><strong>Choose Competition.</strong> Select your meet and check its divisions and team rules. Use Custom to map roster levels to your own competition divisions.</li>
+<li><strong>Open Add Students.</strong> In Roster, paste the enrollment list and read it. Check the imported, already-present and rejected-line counts. Correct any rejected lines and read again. Roster slots store the original roster text. Loading a roster slot replaces the current student list. In Manual, enter a name, four-digit school ID, three-digit student number and roster level.</li>
+<li><strong>Choose students to print.</strong> Toggle Added in each row or select rows and use the batch controls. Permission Slips can match a pasted list of names. Its result counts unique students. Removing a student also clears that student’s team and topic assignment. Undo restores the transaction.</li>
+<li><strong>Assign teams or topics.</strong> Use each row’s Team or Test control. Topic Tests shows the raw number of added students assigned to each test. Summary shows added students over total students in each competition division. Each added student gets one sheet. With Topic Tests on, topic names and codes replace the individual defaults. An unassigned student has a blank test name and code.</li>
+<li><strong>Review PDF Setup.</strong> Check School, printed test names, optional three-digit test codes, font and bubble columns. School ID edits are staged until all four digits are filled and you press Apply. Applying a new ID updates every matching student prefix together. Errors beside Create PDF link to fields that need attention. Turn off Topic Tests to print individual sheets without validating the inactive topic codes.</li>
+<li><strong>Create PDF.</strong> Every successful export opens the generated PDF for review before downloading. If a Name, School or Test string exceeds its box at the chosen font and size, the preview includes a warning. Text is never shrunk. Close the preview to edit, or explicitly download it. Cancel stops generation without downloading a partial file.</li>
+</ol>
+<h2>Roster Levels and Competition Divisions</h2>
+<p>A <strong>roster level</strong> is the granular math level in the enrollment roster. It is stored as the last digit of the eight-digit FAMAT ID. A <strong>competition division</strong> is the group in which that student competes at a particular meet. One division can contain several roster levels.</p>
+<p>Changing Competition remaps groups without rewriting the stored roster ID. Some competitions print a different division digit in column 8. The ID’s conversion indicator explains the difference. Use <strong>Change Level</strong> when the student’s actual roster level needs correction. An incomplete ID is a different error from an invalid level digit.</p>
+<p>Number fields show <code>#</code> for unfilled positions. All required positions must be entered. Typing <code>3</code> into a three-digit student number leaves <code>3##</code>, it does not become <code>003</code>.</p>
+<h2>Names and Print Compatibility</h2>
+<p>Use the non-diacritic spelling accepted by the FAMAT results website. Accented letters and unsupported scripts are intentionally flagged to avoid incompatible results and scanning workflows. This is an application compatibility rule, not a claim that the selected font cannot draw accented letters.</p>
+<p>Text width depends on the selected PDF font. Warnings use that font’s measurements against the actual template field width. Check representative sheets on your printer and scanner before using them at a meet.</p>
+<h2>Save, Recover and Start Over</h2>
+<p>Watch the save status near the page title. Browser storage can be unavailable or full. If saving fails, keep the tab open and use <strong>Settings → Download Backup</strong>. A backup contains the workspace, preferences, saved drafts and saved rosters.</p>
+<p><strong>Restore Backup</strong> normally restores the current workspace and keeps existing saved slots and preferences. Check the replacement option first to restore those from the backup too. That replacement cannot be undone. Workspace-only restoration can be undone.</p>
+<p>If another tab saves a newer workspace, resolve the notice before saving: download this tab as a backup, load the latest saved version, or explicitly keep this tab’s version instead. Work in one editing tab when possible.</p>
+<p>Draft slots store a full workspace. Empty slots cannot be loaded. To start fresh, use <strong>Settings → Reset Everything</strong> and press it again within six seconds. It clears current students, competition setup, preferences and undo history, while preserving both saved draft slots and saved roster slots.</p>
+<h2>Navigation and Smaller Screens</h2>
+<p>Search and Filter stay visible even when no rows match. Clear Search and Clear Filters work independently. On phones, scroll the table sideways to reach each separate column. Division, First, Last and Test retain their own sorting controls.</p>
+<p>Use Tab to move through controls. Dialogs keep focus inside and Escape closes the top dialog. Arrow keys switch menu tabs. Focus a row’s reorder handle and use Alt+↑ or Alt+↓ to move it. The keyboard shortcuts dialog lists the available batch actions.</p>
+<aside><strong>Before a meet:</strong> check the competition rules and template version, inspect a sample PDF, and verify actual printer and scanner output at the intended print scale.</aside>
+</body></html>

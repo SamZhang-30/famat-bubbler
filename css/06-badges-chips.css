@@ -1,0 +1,54 @@
+    /* ============================================================
+       Badges and chips
+       ============================================================ */
+
+    .badge{
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s1);
+      padding: 3px var(--s2);
+      border-radius: var(--r-pill);
+      border: 1px solid var(--line2);
+      background: var(--tint);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .badge[hidden]{ display: none !important; }
+    /* Buttons and the editor's sections are display:flex, which outranks the
+       browser's own [hidden] rule — so hiding one by setting `hidden` did nothing.
+       This is the same trap the division swatches fell into. */
+    button[hidden],
+    .customSection[hidden]{ display: none !important; }
+    .badgeStrong{ background: var(--tintStrong); color: var(--text); }
+    .badgeDanger{
+      border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+      background: color-mix(in srgb, var(--danger) 14%, transparent);
+      color: color-mix(in srgb, var(--danger) 82%, var(--text));
+    }
+    .badgeWarn{
+      border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+      background: color-mix(in srgb, var(--warn) 14%, transparent);
+      color: color-mix(in srgb, var(--warn) 82%, var(--text));
+    }
+
+    kbd, .kbd{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      padding: 2px 6px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--line);
+      border-bottom-width: 2px;
+      background: var(--panel2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .smallNote{ color: var(--muted); font-size: 12px; line-height: 1.5; margin-top: var(--s2); }
+

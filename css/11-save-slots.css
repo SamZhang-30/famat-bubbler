@@ -1,0 +1,75 @@
+    /* ============================================================
+       Save slots (enrollment text and full drafts)
+       ============================================================ */
+
+    .slotRow{
+      display: flex;
+      flex-direction: column;
+      gap: var(--s2);
+      margin-top: var(--s3);
+    }
+    /* One shape for every slot, full or empty: the name and the three buttons on the
+       top line, the summary on its own line under them. It used to be one wrapping
+       flex row, so a slot with a summary long enough to wrap pushed its buttons left
+       while an empty one kept them right, and no two rows of buttons lined up. */
+    .slot{
+      display: flex;
+      flex-direction: column;
+      gap: var(--s1);
+      padding: var(--s2);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--tint);
+    }
+    .slotTop{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      min-width: 0;
+    }
+    .slotBtns{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      flex: 0 0 auto;
+    }
+    /* Fixed width, so Save, Load and Clear sit on the same three columns in every
+       slot. The name box takes whatever is left over. */
+    .slot .slotBtns button{
+      flex: 0 0 auto;
+      min-width: 64px;
+      justify-content: center;
+    }
+    .slot button{ min-height: var(--h-sm); padding: 0 var(--s3); font-size: 12px; }
+    input.slotName{
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: var(--h-sm);
+      padding: 0 var(--s2);
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-sm);
+      font: inherit;
+      font-size: 12.5px;
+      font-weight: 700;
+      outline: none;
+    }
+    input.slotName:focus{
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+      box-shadow: var(--focusRing);
+    }
+    /* Under the name and the buttons, never beside them, so the eye finds a slot's
+       summary in the same place whether or not the slot holds anything. */
+    .slotMeta{
+      color: var(--muted);
+      font-size: 12px;
+      padding-left: var(--s1);
+      min-height: 1em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* An empty slot says so in the same place a full one says what it holds. */
+    .slotMeta[data-empty="1"]{ font-style: normal; opacity: 0.75; }
+

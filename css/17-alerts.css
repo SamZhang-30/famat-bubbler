@@ -1,0 +1,43 @@
+    /* ============================================================
+       Alerts (the two error regions)
+       ============================================================ */
+
+    .alert{
+      display: none;
+      gap: var(--s2);
+      align-items: flex-start;
+      margin-top: var(--s3);
+      padding: var(--s3);
+      border: 1px solid color-mix(in srgb, var(--danger) 38%, transparent);
+      border-left-width: 3px;
+      border-radius: var(--r-md);
+      background: color-mix(in srgb, var(--danger) 10%, transparent);
+      color: color-mix(in srgb, var(--danger) 82%, var(--text));
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+    .alert[data-show="1"]{ display: flex; }
+    .alert .glyph{ width: 15px; height: 15px; margin-top: 2px; flex: 0 0 auto; }
+    .alertBody{ min-width: 0; flex: 1 1 auto; }
+    .alert details{ margin-top: var(--s2); }
+    .alert summary{ cursor: pointer; font-weight: 700; }
+    .alert pre{
+      margin: var(--s2) 0 0;
+      padding: var(--s2);
+      border-radius: var(--r-sm);
+      background: color-mix(in srgb, var(--bg) 55%, transparent);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      max-height: 220px;
+      overflow: auto;
+    }
+    /* kept so any code still writing .textContent to an error node stays legible */
+    .error{ color: color-mix(in srgb, var(--danger) 82%, var(--text)); white-space: pre-wrap; }
+
+    /* ============================================================
+       Sticky action bar
+       ============================================================ */
+

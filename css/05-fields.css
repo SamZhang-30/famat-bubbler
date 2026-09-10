@@ -1,0 +1,150 @@
+    /* ============================================================
+       Fields
+       ============================================================ */
+
+    /* Nothing on this page is set in italics.
+       A ghost value is already saying "not typed yet" twice over — dimmer than a
+       value, and behind a dashed edge — and slanting it a third time only makes it
+       harder to read the one thing it is there to show. Emphasis in prose has the
+       same answer: the house style for it is weight and color, which is what the
+       competition dialog's <em> was already overriding this element's default with.
+       Stated once here so a later <em>, <i>, <cite> or <address> cannot reintroduce
+       what the two of them took out. */
+    em, i, cite, dfn, var, address{ font-style: normal; font-weight: 650; }
+
+    input[type="text"]{
+      min-height: var(--ctlH);
+      min-width: 240px;
+      padding: 0 var(--s3);
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      font: inherit;
+      font-size: 13px;
+      outline: none;
+      caret-color: var(--accent);
+    }
+    input[type="text"]:hover{ border-color: var(--line); }
+    input[type="text"]:focus{
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+      box-shadow: var(--focusRing);
+    }
+    input[type="text"]::placeholder{ color: var(--muted); opacity: 0.55; }
+
+    /* A box showing a value it does not own — the setting that owns it lives in another
+       menu. It goes quiet rather than disappearing: the digits are still worth reading
+       where they are being used. */
+    input[type="text"][readonly]{
+      background: transparent;
+      border-style: dashed;
+      border-color: var(--line);
+      color: var(--muted);
+      cursor: help;
+    }
+    input[type="text"][readonly]:hover{ background: var(--tint); border-color: var(--muted); }
+    input[type="text"][readonly]:focus{ border-color: var(--line); box-shadow: none; }
+    input[type="text"]:disabled{
+      background: transparent;
+      border-style: dashed;
+      border-color: var(--line);
+      color: var(--muted);
+      opacity: 1;
+      cursor: help;
+    }
+
+    select{
+      min-height: var(--ctlH);
+      padding: 0 var(--s2);
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 650;
+      outline: none;
+      cursor: pointer;
+    }
+    select:focus-visible{ box-shadow: var(--focusRing); }
+
+    textarea{
+      width: 100%;
+      min-height: 140px;
+      padding: var(--s3);
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      font-family: var(--mono);
+      font-size: 12.5px;
+      line-height: 1.45;
+      outline: none;
+      resize: vertical;
+      caret-color: var(--accent);
+    }
+    textarea:focus{
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+      box-shadow: var(--focusRing);
+    }
+    #enrollment::placeholder,
+    #filter::placeholder{ color: var(--muted); opacity: 0.42; }
+
+    input[type="checkbox"]{ accent-color: var(--accent); cursor: pointer; }
+
+    input[type="color"]{
+      width: var(--h-md);
+      height: var(--h-sm);
+      padding: 0;
+      border: 1px solid var(--line2);
+      border-radius: var(--r-sm);
+      background: var(--panel2);
+      cursor: pointer;
+    }
+    /* The color a swatch is showing is painted by a shadow part inside the box, and
+       the browser's default for it is a square with a border of its own. Left alone,
+       every swatch in this app was a rectangle of color sitting inside a rounded
+       frame, with the corners of the frame showing daylight around it.
+
+       Concentric, so the two curves share a center: the outer radius is measured on
+       the border box, so the padding box's is that minus the 1px border, and the part
+       is inset a further 2px by the wrapper's padding. --r-sm less three. Stated once
+       here and inherited by .swatchInput, which is one of these inputs. */
+    input[type="color"]::-webkit-color-swatch-wrapper{ padding: 2px; }
+    input[type="color"]::-webkit-color-swatch{
+      border: none;
+      border-radius: calc(var(--r-sm) - 3px);
+    }
+    input[type="color"]::-moz-color-swatch{
+      border: none;
+      border-radius: calc(var(--r-sm) - 3px);
+    }
+
+    /* a labeled field: caption above, control below */
+    .field{ display: flex; flex-direction: column; gap: var(--s1); }
+    .fieldLabel{
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* the file name box and its fixed .pdf tail, sitting on one line */
+    .filenameWrap{
+      display: flex; align-items: center; width: 100%; min-width: 0; font-size: 13px;
+      padding: 0 var(--s3); background: var(--panel2);
+      border: 1px solid var(--line2); border-radius: var(--r-md); cursor: text;
+    }
+    .filenameWrap:hover{ border-color: var(--line); }
+    .filenameWrap:focus-within{
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+      box-shadow: var(--focusRing);
+    }
+    .filenameText{ position: relative; flex: 0 1 auto; min-width: 1px; overflow: hidden; min-height: var(--ctlH); }
+    #filenameMeasure{ display: block; visibility: hidden; white-space: pre; font: inherit; }
+    .filenameWrap #filename{
+      position: absolute; inset: 0; width: 100%; min-width: 0; padding: 0; border: 0; font: inherit;
+      border-radius: 0; background: transparent; box-shadow: none;
+    }
+    .filenameSuffix{ flex: 0 0 auto; color: var(--muted); opacity: 0.65; font-size: 13px; user-select: none; }

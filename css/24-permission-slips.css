@@ -1,0 +1,184 @@
+    /* ============================================================
+       Permission Slips menu
+       ============================================================ */
+
+    .filterRow{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      flex-wrap: wrap;
+      margin-top: var(--s3);
+      min-height: var(--ctlH);
+    }
+    #delimiter{ width: 118px; min-width: 0; }
+
+    /* ---- the settings that ride on the box they are about ------------------------
+       Two controls almost nobody has to touch, kept out of the reading order and put
+       within reach of the thing they change. The button sits over the top-right
+       corner of the textarea, which is the one corner a paste never fills first, and
+       the panel opens from it.
+
+       A <details>, not a popover: it needs no JavaScript, closes with Esc for free in
+       the browsers that support it, and the summary is a real button for the keyboard
+       either way. The panel is absolutely positioned so opening it does not reflow the
+       box below — the whole point is that the textarea stays exactly where it was. */
+    .advWrap{ position: relative; }
+    /* The <details> itself takes no room: its summary is lifted out of the flow onto
+       the textarea's corner, and its body is the only part left in it. Closed, the
+       whole element is zero-height and the box below sits where it always did. */
+    .advPop{ position: static; }
+    /* Round, and deliberately not the settings cog: a cog anywhere in this app means
+       the app's own preferences, and these are two facts about the text in this box.
+       A wrench says "adjust this thing", which is what it does. */
+    .advBtn{
+      position: absolute;
+      top: var(--s2);
+      right: var(--s2);
+      z-index: 6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      list-style: none;
+      cursor: pointer;
+      border: 1px solid var(--line2);
+      border-radius: var(--r-pill);
+      background: var(--panel3);
+      color: var(--muted);
+    }
+    .advBtn::-webkit-details-marker{ display: none; }
+    .advBtn:hover{ background: var(--btnHover); color: var(--text); border-color: var(--line); }
+    .advBtn:focus-visible{ box-shadow: var(--focusRing); }
+    .advBtn .glyph{ width: 14px; height: 14px; }
+    .advPop[open] > .advBtn{
+      background: var(--btnHover);
+      color: var(--text);
+      border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+    }
+    /* Below the box rather than over it.
+       An overlay panel would have covered the very text these two settings are about,
+       which is exactly what you need to look at while deciding whether the delimiter
+       is right. In flow instead: it opens under the textarea, pushes the Apply button
+       down, and the menu it lives in scrolls if it has to. */
+    .advBody{
+      width: 100%;
+      margin-top: var(--s2);
+      padding: var(--s3);
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      background: var(--panel3);
+      box-shadow: var(--shadow);
+    }
+    .advTitle{
+      margin-bottom: var(--s1);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    /* Each control over its own explanation rather than beside it: the panel is
+       narrower than the menu these rows came from, and a pill toggle with a paragraph
+       to its right would have wrapped into an L. */
+    .advRow{
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--s2) var(--s3);
+      padding-top: var(--s3);
+      margin-top: var(--s3);
+      border-top: 1px solid var(--line2);
+    }
+    /* the note takes whatever the control leaves, and wraps rather than pushing the
+       control onto a line of its own */
+    .advRow > .smallNote{ flex: 1 1 190px; min-width: 0; }
+    .advRow:first-of-type{ padding-top: 0; margin-top: 0; border-top: 0; }
+    /* The panel is a transient surface, so its notes stay put rather than collapsing
+       into hover chips — the same rule the popovers and modals already follow. */
+    .advBody .smallNote{ display: block !important; }
+    .advBody .infoTip{ display: none !important; }
+    /* The textarea keeps its own top-right corner clear, so a long first line never
+       runs under the button. */
+    .advWrap > textarea{ padding-right: 42px; }
+
+    .helpDisclosure{
+      margin-top: var(--s3);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--tint);
+      overflow: hidden;
+    }
+    .helpDisclosure > summary{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      list-style: none;
+      cursor: pointer;
+      padding: var(--s2) var(--s3);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .helpDisclosure > summary::-webkit-details-marker{ display: none; }
+    .helpDisclosure > summary::after{ content: "▸"; margin-left: auto; font-size: 11px; font-weight: 900; }
+    .helpDisclosure[open] > summary::after{ content: "▾"; }
+    .helpDisclosure > summary:hover{ color: var(--text); background: var(--tintStrong); }
+    .helpDisclosure[open] > summary{ color: var(--text); border-bottom: 1px solid var(--line2); }
+    .helpDisclosureBody{ padding: var(--s3); color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .helpDisclosureBody p{ margin: var(--s3) 0 0; font-size: 12px; line-height: 1.6; }
+    .helpDisclosureBody strong{ color: var(--text); }
+    .discIcon{
+      width: 13px;
+      height: 13px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: color-mix(in srgb, var(--accent) 72%, var(--text));
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .formulaBlock{ display: block; margin: var(--s3) 0; }
+    .formulaHead{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s2);
+      margin-bottom: var(--s1);
+    }
+    .formulaLang{
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .copyBtn{
+      min-height: var(--h-xs);
+      padding: 0 var(--s2);
+      border-radius: var(--r-pill);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .copyBtn[data-copied="1"]{
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+      background: color-mix(in srgb, var(--accent) 22%, transparent);
+      color: var(--text);
+    }
+    .tipFormula{
+      display: block;
+      margin: var(--s2) 0;
+      padding: var(--s2) var(--s3);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-sm);
+      background: var(--panel2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+

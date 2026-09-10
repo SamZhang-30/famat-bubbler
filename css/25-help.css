@@ -1,0 +1,146 @@
+    /* ============================================================
+       Help chips and the shared bubble
+       ============================================================ */
+
+    .infoTip{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 17px;
+      height: 17px;
+      border-radius: var(--r-pill);
+      border: 1px solid var(--line2);
+      background: var(--tint);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      cursor: help;
+      user-select: none;
+      vertical-align: middle;
+      flex: 0 0 auto;
+    }
+    .infoTip:hover, .infoTip:focus-visible{
+      color: var(--text);
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+      background: color-mix(in srgb, var(--accent) 14%, transparent);
+    }
+    .infoTip[data-kind="caution"]{
+      border-color: color-mix(in srgb, var(--warn) 45%, transparent);
+      background: color-mix(in srgb, var(--warn) 16%, transparent);
+      color: var(--warn);
+    }
+    .infoTip[data-kind="caution"]:hover,
+    .infoTip[data-kind="caution"]:focus-visible{
+      background: color-mix(in srgb, var(--warn) 28%, transparent);
+      border-color: color-mix(in srgb, var(--warn) 66%, transparent);
+      color: var(--warn);
+    }
+    .infoTip svg{
+      width: 11px;
+      height: 11px;
+      display: block;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .infoBubble{
+      position: fixed;
+      z-index: 90;
+      display: none;
+      max-width: 340px;
+      /* Taller than it was. The list note is a glossary of seven columns, and at the
+         old 420px cap a third of it sat below the fold with no scrollbar, no fade and
+         no way to know. Raised here, trimmed at the source, and whatever still does
+         not fit now says so — see [data-more] below. */
+      max-height: min(72vh, 560px);
+      overflow: auto;
+      overscroll-behavior: contain;
+      padding: var(--s3);
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      background: var(--panel3);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      box-shadow: var(--shadow);
+    }
+    .infoBubble.show{ display: block; }
+    /* There is more of this below the fold. A hover bubble has no scrollbar to speak
+       for it, so the text fades out at the bottom edge instead of stopping mid-word —
+       and clicking the chip pins the bubble open, which is how you read the rest. */
+    .infoBubble[data-more="1"]{
+      -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+      mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+    }
+    .infoBubble[data-kind="danger"]{ border-left: 3px solid var(--danger); }
+    .infoBubble[data-kind="caution"]{ border-left: 3px solid var(--warn); }
+    .infoBubble[data-kind="guide"]{ border-left: 3px solid var(--line); }
+    .infoBubble[data-pinned="1"]{ border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); }
+    .infoBubble code{
+      background: var(--tint);
+      padding: 1px 5px;
+      border-radius: var(--r-sm);
+      font-size: 11.5px;
+      color: var(--text);
+    }
+
+    /* A note long enough that a reader has to find their place in it — the list note
+       runs to a screenful, and which of its parts apply changes with the competition —
+       is written as sections headed by the thing they explain. The heading is the
+       label this app already uses wherever a group starts: the shortcut groups and
+       the table's own column headings wear it too. Brighter ink than the body here,
+       which is the other way round from the shortcuts modal, because the prose in a
+       note is muted and a muted heading would not part from it. */
+    .tipSection{
+      margin: var(--s3) 0 var(--s1);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .tipSection:first-child{ margin-top: 0; }
+    /* the gap between two sections is the heading's alone, so it stays one gap */
+    .tipSection + p{ margin: 0; }
+    .infoBubble p{ margin: 0 0 var(--s2); color: inherit; }
+    .infoBubble p:last-child{ margin-bottom: 0; }
+
+    /* Always-on help.
+       Inline, the note's six sections used to stack into a column of paragraphs tall
+       enough to push the table clean off an 860px screen. Set as a grid they read as
+       what they are — a short glossary of the columns — and take three rows instead
+       of twelve. In the default hover mode none of this applies: the note is hidden
+       and only its chip shows. */
+    html[data-help="on"] #listNote{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 0 var(--s4);
+      margin: 0;
+      padding: var(--s3);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--panel2);
+    }
+    /* each heading starts a new grid cell, and its paragraph sits under it */
+    html[data-help="on"] #listNote .tipSection{ margin: 0 0 2px; grid-column: auto; }
+    html[data-help="on"] #listNote p{ margin: 0 0 var(--s3); }
+
+
+    /* help mode: hover chips (default), always-on prose, or nothing */
+    html[data-help="hover"] div.smallNote,
+    html[data-help="hover"] p.smallNote{ display: none; }
+    html[data-help="hover"] .infoTip{ display: inline-flex; }
+    html[data-help="on"] .infoTip{ display: none; }
+    html[data-help="off"] div.smallNote,
+    html[data-help="off"] p.smallNote{ display: none; }
+    html[data-help="off"] .helpDisclosure{ display: none; }
+    html[data-help="off"] .infoTip{ display: none; }
+    /* notes that are labels, or live inside transient surfaces, always stay put */
+    .popover .smallNote,
+    .modal .smallNote,
+    .emptyState .smallNote,
+    .appHeader .smallNote{ display: block !important; }
+

@@ -1,0 +1,52 @@
+    /* ============================================================
+       Click-to-sort headings
+
+       A sortable heading carries both arrows at all times, faded, so the
+       column says it can be sorted before anyone clicks it. The lit arrow is
+       the direction currently in force: down for the first press, up for the
+       second, and back to down for the third. Only the left-aligned columns
+       take part — a centered one has no room beside its label, and neither an
+       ID nor a bubbled Team Number is worth ordering by.
+       ============================================================ */
+    #studentsRoot th.sortTh{
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    #studentsRoot th.sortTh:hover,
+    #studentsRoot th.sortTh:focus-visible{ color: var(--text); }
+    #studentsRoot th.sortTh:focus-visible{ outline: 2px solid var(--accent); outline-offset: -2px; }
+    /* Label and arrows are one inline-flex box whose first item is the text, so
+       the heading keeps the baseline it had before the arrows existed — a bare
+       inline-flex beside the label hangs its bottom edge on that baseline instead,
+       which grows the line box and lifts the sortable headings off the row. Both
+       items are centered in the same line, so the arrows sit level with the text. */
+    .sortLabel{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sortArrows{
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .sortArrows svg{
+      display: block;
+      width: 8px;
+      height: 5px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.26;
+      transition: opacity 120ms ease, color 120ms ease;
+    }
+    th.sortTh[data-dir="up"] .sortUp,
+    th.sortTh[data-dir="down"] .sortDown{
+      opacity: 1;
+      color: var(--accentInk);
+    }
+

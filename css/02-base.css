@@ -1,0 +1,62 @@
+    /* ============================================================
+       Base
+       ============================================================ */
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin: 0;
+      padding: var(--s4);
+      padding-bottom: var(--stickyPad);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* The list sits the same distance from every edge of the page: the body holds
+       var(--s4) at the sides, and above the panel that distance is this padding plus
+       the panel's own var(--s3) top margin. Held here rather than on the panel because
+       the padding is also what keeps that margin from collapsing out through the wrap,
+       and because the alert that opens above the list then starts at the same inset.
+       The matching pair for the bottom edge is the gap inside --stickyPad. */
+    .wrap{ max-width: var(--wrapW); margin: 0 auto; padding-top: var(--s1); }
+
+    /* --accentInk, not --accent: the raw accent is tuned for the dark panel and
+       lands at 2.3:1 on the light page, which the Tutorial link under the title
+       fails on. --accentInk pins the lightness and keeps the hue, so a custom accent
+       from Settings stays legible in both themes too. */
+    a{ color: var(--accentInk); text-decoration: none; }
+    a:hover{ text-decoration: underline; }
+
+    h2, h3, h4{ margin: 0; font-weight: 700; letter-spacing: 0.1px; }
+    p{ color: var(--muted); }
+    label{ color: var(--muted); }
+
+    code{ font-family: var(--mono); }
+
+    :focus-visible{ outline: none; box-shadow: var(--focusRing); }
+
+    /* Off-screen until it is tabbed to, which is the only time it is wanted. */
+    .skipLink{
+      position: fixed;
+      top: var(--s2);
+      left: var(--s2);
+      z-index: 100;
+      padding: var(--s2) var(--s3);
+      border: 1px solid color-mix(in srgb, var(--accent) 48%, transparent);
+      border-radius: var(--r-md);
+      background: var(--panel3);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: var(--shadow);
+      transform: translateY(calc(-100% - var(--s4)));
+      transition: transform 120ms ease;
+    }
+    .skipLink:focus-visible{ transform: translateY(0); text-decoration: none; }
+    @media (prefers-reduced-motion: reduce){ .skipLink{ transition: none; } }
+
+    .row{ display: flex; gap: var(--s2); flex-wrap: wrap; align-items: center; }
+    .center{ text-align: center; }
+

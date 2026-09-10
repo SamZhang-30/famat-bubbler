@@ -1,0 +1,94 @@
+    /* ============================================================
+       Settings
+       ============================================================ */
+
+    .setGroup{ margin-bottom: var(--s5); }
+    .setGroup:last-child{ margin-bottom: 0; }
+    .setGroupTitle{
+      margin-bottom: var(--s1);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .setList{ display: flex; flex-direction: column; }
+    .setRow{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s4);
+      padding: var(--s3) 0;
+      border-bottom: 1px solid var(--line2);
+      flex-wrap: wrap;
+    }
+    .setRow:last-child{ border-bottom: none; }
+    .setLabel{ font-weight: 700; color: var(--text); font-size: 13.5px; }
+    .setHint{ color: var(--muted); font-size: 12px; margin-top: 2px; }
+    /* Settings used to mix four control idioms in one list: 34px segmented controls,
+       bare 17px native checkboxes, a native color input and a swatch row. The
+       checkbox rows read as less important than the three-way ones purely because the
+       control was smaller — backwards for "Sticky Page Header" and "Selection Column".
+       The boolean rows now wear a switch built to the same height and the same accent
+       as the segments, so weight tracks importance instead of widget choice.
+
+       Still a real <input type="checkbox">: the label, the keyboard behavior and every
+       line of JS that reads .checked are untouched. Only the paint changes. */
+    .setRow input[type="checkbox"]{
+      appearance: none;
+      -webkit-appearance: none;
+      flex: 0 0 auto;
+      position: relative;
+      width: 46px;
+      height: var(--h-md);
+      margin: 0;
+      padding: 3px;
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--panel2);
+      cursor: pointer;
+      transition: background 90ms ease, border-color 90ms ease;
+    }
+    /* The knob, inset 3px from the track's padding box on all four sides — which is
+       the same 3px the track pads with, so the gap around it is even at rest and even
+       again once it has travelled.
+       box-sizing is stated because it has to be: `*` selects elements, not pseudo-
+       elements, so this one was defaulting to content-box while every other box on the
+       page was border-box. Its 1px border was therefore outside the width it declared,
+       which is what put it 2px past where the arithmetic below thought it was — hard
+       against the track's right edge in the on position, with the left, top and bottom
+       insets all correct. Sized border-box, the three numbers here mean what they look
+       like: half the track less its own inset, the full height less both insets, and a
+       travel that lands the far edge exactly one inset short of the end. */
+    .setRow input[type="checkbox"]::after{
+      content: "";
+      position: absolute;
+      box-sizing: border-box;
+      top: 3px;
+      left: 3px;
+      width: calc(50% - 2px);
+      height: calc(100% - 6px);
+      border: 1px solid transparent;
+      border-radius: var(--r-md-in);
+      background: var(--btn);
+      transition: transform 120ms ease, background 90ms ease, border-color 90ms ease;
+    }
+    .setRow input[type="checkbox"]:hover{ border-color: var(--line); }
+    .setRow input[type="checkbox"]:checked{
+      background: color-mix(in srgb, var(--accent) 14%, transparent);
+      border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+    }
+    .setRow input[type="checkbox"]:checked::after{
+      /* its own width, less the 2px that its width is short of half the track: what is
+         left over is exactly the two 3px insets it must not cross */
+      transform: translateX(calc(100% - 2px));
+      background: color-mix(in srgb, var(--accent) 55%, transparent);
+      border-color: color-mix(in srgb, var(--accent) 62%, transparent);
+    }
+    .setRow input[type="checkbox"]:focus-visible{ box-shadow: var(--focusRing); }
+    @media (prefers-reduced-motion: reduce){
+      .setRow input[type="checkbox"]::after{ transition: none; }
+    }
+    /* the color input is the one control that cannot be anything but itself; it at
+       least takes the same height as its neighbours */
+    .setRow input[type="color"]{ height: var(--h-md); width: 46px; }

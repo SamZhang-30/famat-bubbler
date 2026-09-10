@@ -1,0 +1,89 @@
+    /* ============================================================
+       Controls: one button, four variants, two sizes
+       ============================================================ */
+
+    button{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s2);
+      min-height: var(--ctlH);
+      padding: 0 var(--s3);
+      background: var(--btn);
+      color: var(--text);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 650;
+      line-height: 1;
+      cursor: pointer;
+      transition: background 90ms ease, border-color 90ms ease;
+    }
+    button:hover{ background: var(--btnHover); }
+    button:active{ transform: translateY(0.5px); }
+    button:disabled{ opacity: 0.45; cursor: not-allowed; }
+    button:disabled:hover{ background: var(--btn); }
+    button:focus-visible{ box-shadow: var(--focusRing); }
+
+    .primary{
+      background: color-mix(in srgb, var(--accent) 22%, transparent);
+      border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+      color: var(--text);
+      font-weight: 750;
+    }
+    .primary:hover{ background: color-mix(in srgb, var(--accent) 32%, transparent); }
+    .primary:disabled:hover{ background: color-mix(in srgb, var(--accent) 22%, transparent); }
+
+    .danger{
+      background: color-mix(in srgb, var(--danger) 12%, transparent);
+      border-color: color-mix(in srgb, var(--danger) 32%, transparent);
+      color: color-mix(in srgb, var(--danger) 80%, var(--text));
+    }
+    .danger:hover{ background: color-mix(in srgb, var(--danger) 20%, transparent); }
+
+    .mutedBtn{ color: var(--muted); }
+    .mutedBtn:hover{ color: var(--text); }
+
+    /* the small pill button used all over the list, modals and the sticky bar */
+    .mini{
+      min-height: var(--h-sm);
+      padding: 0 var(--s3);
+      border-radius: var(--r-pill);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* A .mini carrying its glyph alone. Square rather than pill-wide, on the same
+       28px as the labelled ones so a toolbar can mix the two, with the label moved
+       to the tooltip and the aria-label. It is a minimum rather than a width: put
+       something beside the glyph and the button grows to hold it, which is how the
+       filter keeps showing how many columns it has in force. */
+    .mini.miniIcon{
+      min-width: var(--h-sm);
+      padding: 0 var(--s1);
+      gap: 0;
+    }
+    .mini.miniIcon .glyph{ width: 14px; height: 14px; }
+
+    /* icon-only button in the app header */
+    .iconBtn{
+      width: var(--h-md);
+      min-height: var(--h-md);
+      padding: 0;
+      border-radius: var(--r-pill);
+    }
+    .glyph{
+      width: 16px;
+      height: 16px;
+      display: block;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    /* the icon shows the mode you would switch to */
+    html[data-theme="dark"]  .icon-moon,
+    html[data-theme="light"] .icon-sun{ display: none; }
+

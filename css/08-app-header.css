@@ -1,0 +1,226 @@
+    /* ============================================================
+       App header
+       ============================================================ */
+
+    /* Pinned so the title, the competition these sheets are for, and the setup menus
+       are all still there at row 200. It sits outside .wrap and bleeds through the
+       body padding, exactly as the sticky footer does, so nothing scrolls past its
+       sides; .pageHeadInner carries the page width instead.
+
+       z-index 46 puts it over the list toolbar (32) and the sticky column headers (4),
+       and under the sticky footer (50) and the modals (80). The setup menus (45) are
+       its own descendants, so they still open over the page but stay under the footer,
+       which is where they were before. */
+    .pageHead{
+      position: sticky;
+      top: 0;
+      z-index: 46;
+      background: var(--bg);
+      margin: calc(var(--s4) * -1) calc(var(--s4) * -1) 0;
+      padding: var(--s4) var(--s4) 0;
+      border-bottom: 1px solid var(--line2);
+    }
+    .pageHeadInner{ max-width: var(--wrapW); margin: 0 auto; }
+    html[data-stickytop="0"] .pageHead{ position: static; }
+    /* A pinned header above a fixed footer leaves a landscape phone nothing to read
+       through. JS zeroes --pageHeadH to match whenever this rule is the one in force. */
+    @media (max-height: 520px){
+      .pageHead{ position: static; }
+    }
+
+    .appHeader{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s3);
+      flex-wrap: wrap;
+      padding-bottom: var(--s3);
+    }
+    .appHeaderLeft{
+      display: flex;
+      align-items: center;
+      gap: var(--s5);
+      flex-wrap: wrap;
+    }
+    /* The Competition entry point. It is not a <details>, because it opens a modal
+       rather than a menu body, but it is the same kind of thing to the user — so it
+       wears the summary's exact chrome. The shared declarations live on the summary
+       rule below; this only adds what a <button> does not already have. */
+    .setupChip{ flex: 0 0 auto; }
+    .setupDivide{
+      flex: 0 0 auto;
+      align-self: center;
+      width: 1px;
+      height: 18px;
+      margin: 0 var(--s1);
+      background: var(--line2);
+    }
+
+    /* competition dialog */
+    .compOptions{ display: flex; flex-direction: column; gap: var(--s2); margin-bottom: var(--s4); }
+    .compOption{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      width: 100%;
+      min-height: 0;
+      padding: var(--s3);
+      text-align: left;
+      border-radius: var(--r-md);
+      background: var(--tint);
+    }
+    .compOption[aria-pressed="true"]{
+      background: color-mix(in srgb, var(--accent) 16%, transparent);
+      border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+    }
+    .compOptName{ font-size: 13.5px; font-weight: 750; color: var(--text); }
+    .compOptNote{ font-size: 12px; font-weight: 500; line-height: 1.5; color: var(--muted); white-space: normal; }
+
+    .compReport{
+      margin-bottom: var(--s4);
+      padding: var(--s3);
+      border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+      border-left-width: 3px;
+      border-radius: var(--r-md);
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      color: var(--text);
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+
+    /* A section, not a continuation. Sixteen pixels below a paragraph of prose is the
+       gap between two paragraphs, so the Test-field boxes read as more of the same
+       explanation rather than as the next thing to fill in. The rule and the wider gap
+       are the same break the modal's own header uses, and the same one the custom
+       editor puts above each of its sections. */
+    .compNames{
+      margin-top: var(--s5);
+      padding-top: var(--s4);
+      border-top: 1px solid var(--line2);
+    }
+    /* The caption is a pill now, so it stops being type and stops needing the caption
+       type rules; what is left beside it is the roster divisions feeding the field. */
+    .compNames .fieldLabel{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      text-transform: none;
+      letter-spacing: 0.2px;
+      font-size: 11px;
+      min-height: var(--h-pill);
+    }
+    .capFrom{ color: var(--muted); font-weight: 650; }
+    /* The name and its ID sit on one line: they are two halves of one answer about a
+       division, and stacking them would read as two separate settings. */
+    .divTestRow{ display: flex; align-items: center; gap: var(--s2); }
+    .divTestRow input[data-divlabel]{ width: 170px; min-width: 0; }
+    /* Three digits and nothing else, so it is sized and set for three digits — the
+       mono face is the one the bubbled columns are drawn in, which is what this box
+       is filling. */
+    .divTestIdInput{
+      width: 64px;
+      min-width: 0 !important;
+      padding: 0 var(--s2);
+      font-family: var(--mono);
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    /* Blank is a valid answer and one digit is not: an ID has to be all three or none
+       of them, and a part-typed one stops the PDF. Marked on the box as well as
+       counted in the Errors pill, which names every offending box and opens the menu
+       holding the first — the mark is what tells you which one you have landed on. */
+    .divTestIdInput[data-bad="1"],
+    .topicCodeInput[data-bad="1"]{
+      border-color: color-mix(in srgb, var(--danger) 60%, transparent);
+      background: color-mix(in srgb, var(--danger) 12%, transparent);
+    }
+    .topicCodeInput[data-bad="1"]:focus,
+    .divTestIdInput[data-bad="1"]:focus{
+      border-color: color-mix(in srgb, var(--danger) 75%, transparent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 22%, transparent);
+    }
+    .compNames [data-divfield][hidden]{ display: none; }
+    /* A Test box showing its assumption is still editable, so it keeps the ordinary
+       solid field border. Its muted placeholder distinguishes the assumed value from
+       typed text without implying that the control is locked. */
+    .compNames input[data-assumed="1"]{ border-style: solid; color: var(--muted); }
+    .compNames input[data-assumed="1"]::placeholder{ color: var(--muted); opacity: 0.55; }
+    /* Topic Tests owns the printed name and code together. Once that switch is on,
+       even an assumed name is non-editable and uses the same dashed treatment as its
+       code field. Assumed fields remain solid only while they are editable. */
+    .compNames input[data-divlabel]:disabled,
+    .compNames input[data-divtestid]:disabled{
+      background: transparent;
+      border-style: dashed;
+      border-color: var(--line);
+      color: var(--muted);
+      cursor: help;
+    }
+
+    .compWarn{
+      display: flex;
+      align-items: flex-start;
+      gap: var(--s2);
+      margin-bottom: var(--s4);
+      padding: var(--s3);
+      border: 1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+      border-left-width: 3px;
+      border-radius: var(--r-md);
+      background: color-mix(in srgb, var(--warn) 10%, transparent);
+      color: color-mix(in srgb, var(--warn) 85%, var(--text));
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+    .compWarn .glyph{ width: 15px; height: 15px; margin-top: 2px; flex: 0 0 auto; }
+
+    /* this one explains how data can be lost, so it is never hidden by the help preference */
+    .compExplain{
+      margin-top: var(--s4);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--tint);
+      overflow: hidden;
+    }
+    .compExplain > summary{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      list-style: none;
+      cursor: pointer;
+      padding: var(--s2) var(--s3);
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .compExplain > summary::-webkit-details-marker{ display: none; }
+    .compExplain > summary::after{ content: "▸"; margin-left: auto; font-size: 11px; font-weight: 900; }
+    .compExplain[open] > summary::after{ content: "▾"; }
+    .compExplain > summary:hover{ color: var(--text); background: var(--tintStrong); }
+    .compExplain[open] > summary{ color: var(--text); border-bottom: 1px solid var(--line2); }
+    .compExplainBody{ padding: var(--s3); color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .compExplainBody p{ margin: var(--s3) 0 0; }
+    .compExplainBody p:first-child{ margin-top: 0; }
+    .compExplainBody strong{ color: var(--text); }
+    .compExplainBody em{ color: var(--text); }
+
+    /* Every row the same height, whether its division competes or not.
+       A competing row holds a division pill and a row that does not holds plain text,
+       so the table used to breathe in and out down its own length — the excluded
+       levels sitting visibly tighter than the rest. The height is the pill's, given
+       to the cell rather than to what happens to be inside it. */
+    .compTable td{ font-size: 13px; height: calc(var(--h-pill) + 2 * var(--s2)); }
+    .compTable .rosterCell{ color: var(--muted); }
+    .compTable .digitCell{ font-family: var(--mono); font-weight: 700; text-align: center; }
+    .compTable .nameCell{ font-weight: 650; }
+    .compTable select{ min-height: var(--h-sm); width: 68px; }
+    .compTable input[type="text"]{ min-height: var(--h-sm); min-width: 0; width: 100%; }
+    .compHint{ margin-top: var(--s3); color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    .appTitle{
+      margin: 0;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+    .appHeader .smallNote{ margin-top: 2px; }

@@ -1,0 +1,190 @@
+    /* ============================================================
+       Narrow
+
+       There used to be four thresholds and none of them knew about the others: a
+       media query at 860 for the table, the setup bar starting to scroll at about
+       775 because its content ran out of room, the header wrapping at about 543 for
+       the same reason, and a height query at 520. Between them sat states nobody
+       designed — most visibly a window with two horizontal scrollbars stacked one
+       above the other, and a phone showing two and a half of the list's ten columns.
+
+       Three deliberate ideas replace that:
+
+         1. Wherever something scrolls sideways, its cut edge fades, so a clipped
+            chip reads as "more this way" rather than as a rendering fault.
+         2. The list sheds columns as the room for them runs out, worst-first, so
+            the columns that matter — who they are, and whether they are added —
+            survive down to a phone instead of being the first things off the edge.
+         3. Anything still overflowing scrolls, but visibly.
+
+       The shedding is by container, not by viewport: the page-width preference can
+       leave a narrow list on a wide screen, and it is the list's own width that
+       decides whether a column fits.
+       ============================================================ */
+
+    /* --- 1. a fade on every edge a scroller runs off ---
+
+       Anything in this app that runs out of room sideways scrolls rather than wraps —
+       the setup bar, the student list, the selection bar, the answer-column picker.
+       Left alone, all of them end the same way: a chip or a column heading chopped
+       through the middle at the container's edge, which reads as a rendering fault
+       rather than as "there is more of this over here".
+
+       One treatment for all of them, and it is a mask rather than an overlay. A mask
+       makes the last few pixels of content transparent, so what shows through is
+       whatever surface the scroller happens to be sitting on — the page behind the
+       setup bar, --panel2 behind the table, --panel3 behind the selection bar. No
+       gradient has to be told which color to fade to, and none of them can drift
+       apart later.
+
+       Each edge fades only when there is something past it, which is what data-scroll
+       carries. A fade over an edge with nothing beyond it would be a lie about where
+       the content ends.
+
+       Masks are painted inside the border box, so a scroller must not carry its own
+       frame or the fade eats it: .tableScroll and #bubbles hold the border, and the
+       box that scrolls inside them holds the mask.
+
+       The table runs out of room downward as well, and the same argument applies to
+       its top and bottom edges: a row cut in half at the frame is the same rendering
+       fault as a column heading cut in half at it. So there are four edges, not two,
+       and the mask is one gradient per axis, intersected: the horizontal layer says
+       which of left/right has more past it, the vertical layer says the same of
+       top/bottom, and a pixel is shown only where both agree. Each axis lives in a
+       custom property so the states can be written one at a time and still combine;
+       the property is opaque by default, which composites to nothing.
+
+       Vertical is opt-in with data-vscroll. Tables, centered dialog bodies and pinned
+       dropdowns use it. A row of chips or a toolbar has one axis, so fading the other
+       would imply content that is not there. --- */
+    [data-sidescroll]{
+      --fadeW: var(--s5);
+      /* A row is much shorter than a chip is wide, so the vertical fade is shorter
+         too — a 24px ramp swallows an entire row at compact density. */
+      --fadeH: var(--s4);
+      /* Where the top fade starts. Zero everywhere but the table, whose column
+         headings are pinned to the top of its own scroller: a fade from 0 would take
+         the headings with it, and they are never what is scrolling out of sight. The
+         table's figure is the heading row's measured height, set from JS, because it
+         moves with the density and with the sticky-header preference. */
+      --fadeTop: 0px;
+      --maskX: linear-gradient(to right, #000 0, #000 100%);
+      --maskY: linear-gradient(to bottom, #000 0, #000 100%);
+    }
+    [data-sidescroll][data-scroll~="start"]{
+      --maskX: linear-gradient(to right, transparent 0, #000 var(--fadeW));
+    }
+    [data-sidescroll][data-scroll~="end"]{
+      --maskX: linear-gradient(to left, transparent 0, #000 var(--fadeW));
+    }
+    /* scrolled to neither end: both edges have more past them */
+    [data-sidescroll][data-scroll~="start"][data-scroll~="end"]{
+      --maskX: linear-gradient(to right, transparent 0, #000 var(--fadeW),
+                               #000 calc(100% - var(--fadeW)), transparent 100%);
+    }
+    /* The top one starts below the pinned headings rather than at the edge, so the
+       first stop is opaque out to --fadeTop and the ramp runs from there. */
+    [data-sidescroll][data-scroll~="top"]{
+      --maskY: linear-gradient(to bottom, #000 0, #000 var(--fadeTop),
+                               transparent var(--fadeTop),
+                               #000 calc(var(--fadeTop) + var(--fadeH)));
+    }
+    [data-sidescroll][data-scroll~="bottom"]{
+      --maskY: linear-gradient(to top, transparent 0, #000 var(--fadeH));
+    }
+    [data-sidescroll][data-scroll~="top"][data-scroll~="bottom"]{
+      --maskY: linear-gradient(to bottom, #000 0, #000 var(--fadeTop),
+                               transparent var(--fadeTop),
+                               #000 calc(var(--fadeTop) + var(--fadeH)),
+                               #000 calc(100% - var(--fadeH)), transparent 100%);
+    }
+    /* Applied only while an edge is live. A mask that is on at rest is two opaque
+       gradients and changes nothing you can see, but it still forces the box onto its
+       own composited layer and re-cuts every glyph in it, which is a visible change to
+       a table full of type for no gain. The prefixed composite comes first: where both
+       are understood the standard one below it wins, and where neither is the mask
+       falls back to a union of the two layers, which is simply no fade. */
+    [data-sidescroll="mask"]:is([data-scroll~="start"], [data-scroll~="end"],
+                                [data-scroll~="top"],   [data-scroll~="bottom"]){
+      -webkit-mask-image: var(--maskX), var(--maskY);
+              mask-image: var(--maskX), var(--maskY);
+      -webkit-mask-composite: source-in;
+              mask-composite: intersect;
+    }
+
+    /* The one that cannot take a mask.
+       A mask applies to everything the element paints, descendants included — and the
+       setup bar's descendants include the five open menus, which are laid out well
+       below the bar's own box, where the mask covers nothing at all. Masking the bar
+       therefore made every menu vanish. So this one keeps the same fade drawn as an
+       overlay on the box around it: a pseudo-element paints over the bar without
+       clipping anything inside it, and the menus (z-index 45) still sit above it. */
+    .setupBarWrap{ position: relative; }
+    .setupBarWrap::before,
+    .setupBarWrap::after{
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: var(--s5);
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 120ms ease;
+    }
+    .setupBarWrap::before{ left: 0;  background: linear-gradient(to right, var(--bg), transparent); }
+    .setupBarWrap::after{  right: 0; background: linear-gradient(to left,  var(--bg), transparent); }
+    .setupBarWrap:has(> [data-scroll~="start"])::before{ opacity: 1; }
+    .setupBarWrap:has(> [data-scroll~="end"])::after{ opacity: 1; }
+    @media (prefers-reduced-motion: reduce){
+      .setupBarWrap::before, .setupBarWrap::after{ transition: none; }
+    }
+    /* A row of tall boxes wants a shorter fade than a toolbar of pills, or the last
+       box is half gone before it is half faded. */
+    #bubblesScroll{ --fadeW: var(--s4); }
+
+    /* --- 2. what happens to the table when the room runs out ---
+       Nothing. It keeps every column and scrolls, and the fade above says so.
+
+       An earlier pass here shed columns as the list narrowed — the grip, then the
+       FAMAT ID, then Team, and the selection checkbox on a phone — on the reasoning
+       that Added should never be the thing that falls off the edge. That was the same
+       mistake this redesign takes out of the Fill Teams buttons a few hundred lines
+       up: a control that disappears explains nothing, and nobody asked for it to go.
+       Worse here, because Settings already owns the switches for exactly these
+       columns, so hiding them by width quietly contradicted a choice the user had
+       made.
+
+       So the columns the user asked for are the columns they get, at every width, and
+       the scroll is made honest rather than designed away. --- */
+
+    /* --- 3. the page chrome at narrow widths --- */
+    @media (max-width: 620px){
+      /* The three icon buttons used to drop onto a third row and go left-aligned —
+         the same controls, in a different place, at a width the user did not choose.
+         The header stays one row: the title shrinks instead. */
+      .appHeader{ flex-wrap: nowrap; gap: var(--s2); }
+      .appHeaderLeft{ min-width: 0; }
+      .appTitle{ font-size: 15px; }
+      .appHeader .row{ flex: 0 0 auto; flex-wrap: nowrap; }
+
+      /* The sticky footer is the one band that must never wrap: Create PDF is the
+         page's purpose and undo is how you get back. */
+      .stickyInner{ flex-wrap: nowrap; gap: var(--s2); }
+      .stickyLeft, .stickyRight{ flex-wrap: nowrap; min-width: 0; }
+      #stickyStats{ display: none; }   /* the same count is in the list's own header */
+      .toast{ left: var(--s2); right: var(--s2); max-width: none; }
+      /* Nothing in this bar may stack: three words wrapping to three lines is how a
+         fixed footer eats a phone screen. The blocker chip is the one flexible item,
+         so it is the one that truncates. */
+      .stickyInner button{ white-space: nowrap; }
+      /* At this width the severity pills are already down to a glyph and a number,
+         which is two fixed sizes and cannot be squeezed further. */
+    }
+
+    /* A short window — a phone held sideways — has no room for a pinned header above
+       a fixed footer, so the header lets go and scrolls with the page. Unchanged in
+       effect; stated here so all four thresholds read as one set. */
+    @media (max-height: 520px){
+      .setupBar{ padding: var(--s2) 0; }
+    }

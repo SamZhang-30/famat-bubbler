@@ -1,0 +1,139 @@
+    /* ============================================================
+       Filtering
+
+       A filter is invisible by nature: the rows it removes leave nothing behind to
+       look at. So it says so three times over — the button lights up and counts the
+       columns in force, a strip above the table names them, and the strip carries
+       the way out.
+       ============================================================ */
+    #btnFilter[data-on="1"]{
+      color: var(--accentInk);
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+      background: color-mix(in srgb, var(--accent) 14%, transparent);
+    }
+    /* Empty most of the time, and an empty flex item still takes the row's gap — 8px
+       of nothing between "Filter" and the button's right edge, which read as the label
+       being off-center. Out of the layout until it has a number in it. */
+    #filterCount:empty{ display: none; }
+    #filterCount:not(:empty){
+      margin-left: 6px;
+      padding: 0 6px;
+      border-radius: var(--r-pill);
+      background: var(--accent);
+      color: #0f1115;
+      font-size: 10.5px;
+      font-weight: 800;
+    }
+    .filterStrip{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      margin: var(--s2) 0 0;
+      padding: var(--s2) var(--s3);
+      border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--line2));
+      border-radius: var(--r-md);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+      color: var(--text);
+      font-size: 12.5px;
+    }
+    .filterStrip[hidden]{ display: none; }
+    .filterStrip .glyph{ width: 14px; height: 14px; color: var(--accentInk); flex: 0 0 auto; }
+    .filterStrip span{ flex: 1 1 auto; min-width: 0; }
+
+    .filterGroup{ margin-top: var(--s3); }
+    .filterGroupHead{
+      display: flex;
+      align-items: baseline;
+      gap: var(--s2);
+      margin-bottom: var(--s2);
+    }
+    .filterGroupHead h4{ margin: 0; font-size: 12px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--muted); }
+    .filterGroupHead button{ min-height: var(--h-xs); padding: 0 var(--s2); font-size: 11px; }
+    .filterChips{ display: flex; flex-wrap: wrap; gap: var(--s1); }
+    .filterChip{
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: var(--h-sm);
+      padding: 0 var(--s2);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-pill);
+      background: var(--panel2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .filterChip .tick{
+      position: relative;
+      width: 13px;
+      height: 13px;
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      flex: 0 0 auto;
+    }
+    /* a drawn tick rather than a filled square: at 13px the difference between
+       "on" and "off" has to survive being glanced at, not studied */
+    .filterChip .tick::after{
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: 1px;
+      width: 4px;
+      height: 7px;
+      border: solid #0f1115;
+      border-width: 0 2px 2px 0;
+      transform: rotate(42deg);
+      opacity: 0;
+    }
+    .filterChip[aria-pressed="true"]{ color: var(--text); border-color: var(--line); }
+    .filterChip[aria-pressed="true"] .tick{
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+    .filterChip[aria-pressed="true"] .tick::after{ opacity: 1; }
+
+    /* Six labeled outcomes: as a list they can be scanned, where as six paragraphs
+       they had to be read start to finish. */
+    .compChanges{ margin: 0; display: grid; grid-template-columns: auto 1fr; gap: var(--s2) var(--s3); align-items: baseline; }
+    .compChanges dt{
+      justify-self: start;
+      padding: 1px 8px;
+      border-radius: var(--r-pill);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+    .compChanges dt[data-kind="keep"]{ background: color-mix(in srgb, var(--ok) 18%, transparent); color: color-mix(in srgb, var(--ok) 80%, var(--text)); }
+    .compChanges dt[data-kind="derive"]{ background: color-mix(in srgb, var(--accent) 20%, transparent); color: var(--text); }
+    .compChanges dt[data-kind="clear"]{ background: color-mix(in srgb, var(--warn) 20%, transparent); color: color-mix(in srgb, var(--warn) 85%, var(--text)); }
+    .compChanges dd{ margin: 0; color: var(--muted); line-height: 1.55; }
+
+    /* keyboard shortcut reference */
+    .shortcutGrid{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s4) var(--s5);
+    }
+    @media (max-width: 720px){ .shortcutGrid{ grid-template-columns: 1fr; } }
+    .shortcutGroup h4{
+      margin-bottom: var(--s2);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .shortcutRow{
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--s3);
+      padding: var(--s2) 0;
+      border-bottom: 1px solid var(--line2);
+      font-size: 12.5px;
+    }
+    .shortcutRow:last-child{ border-bottom: none; }
+    .shortcutRow .keys{ display: flex; gap: var(--s1); flex: 0 0 auto; }
+

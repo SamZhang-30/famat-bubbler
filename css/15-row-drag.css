@@ -1,0 +1,35 @@
+    /* ============================================================
+       The grip, and dragging a row
+
+       Grip and checkbox sit side by side rather than taking turns in one column.
+       They answer different questions — "move this row" and "act on these rows" —
+       and a mode switch between them would mean entering a mode to tick a box and
+       leaving it to drag. Two narrow columns cost 24px and no modality, and the
+       two combine: dragging a row that is part of the selection carries the whole
+       selection with it.
+
+       The grip is faint until its row is hovered, so seven columns of dots do not
+       compete with the names.
+       ============================================================ */
+    #studentsRoot td.gripCol,
+    #studentsRoot th.gripCol{ padding-left: var(--s1); padding-right: 0; }
+    .rowGrip{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: var(--h-row);
+      color: var(--muted);
+      opacity: 0.28;
+      cursor: grab;
+      transition: opacity 120ms ease;
+    }
+    .rowGrip svg{ width: 10px; height: 16px; fill: currentColor; }
+    tr:hover .rowGrip{ opacity: 0.85; }
+    .rowGrip:active{ cursor: grabbing; }
+    tr.isDragging{ opacity: 0.4; }
+    /* the row being dragged over says which side it will land on */
+    tr.dropBefore td{ box-shadow: inset 0 2px 0 0 var(--accent); }
+    tr.dropAfter td{ box-shadow: inset 0 -2px 0 0 var(--accent); }
+    html[data-dragging="1"] .cellInput{ pointer-events: none; }
+

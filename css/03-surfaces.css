@@ -1,0 +1,12 @@
+    /* ============================================================
+       Surfaces
+       ============================================================ */
+
+    .panel{
+      background: var(--panel);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-lg);
+      padding: var(--s4);
+      margin: var(--s3) 0;
+    }
+

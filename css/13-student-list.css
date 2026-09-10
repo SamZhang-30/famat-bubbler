@@ -1,0 +1,595 @@
+    /* ============================================================
+       Student list
+       ============================================================ */
+
+    /* Sized against the panel rather than the window, because the page-width
+       preference can leave a narrow panel on a wide screen. */
+    /*
+     * One inset, everywhere. The padding sets the distance from the panel's edge to
+     * anything inside it, and the gap sets the distance between the things inside —
+     * the same number, so the toolbar, the counts row and the table frame sit on one
+     * rhythm instead of the 9/20/24/29 the stacked .panel margins used to produce.
+     * The children below all give up their own margins to it; a flex column does not
+     * collapse adjacent margins, so leaving them in place doubled every gap.
+     */
+    #studentsPanel{
+      container-type: inline-size;
+      display: flex;
+      flex-direction: column;
+      gap: var(--s3);
+      padding: var(--s3);
+    }
+    #studentsByDiv,
+    #studentsTable{
+      display: flex;
+      flex-direction: column;
+      gap: var(--s3);
+    }
+    /* .listBar is exempt: its own negative top margin is what lands its content on the
+       same inset as the cards below it, and what keeps its background flush with the
+       panel edge when it is pinned. */
+    #studentsPanel > *:not(.listBar),
+    #studentsTable > .panel,
+    #studentsByDiv > .panel,
+    #studentsTable > .filterStrip{ margin: 0; }
+
+    /* One frame, not three.
+     *
+     * The list used to be a bordered card inside a bordered card inside a bordered
+     * scroll window: three rounded rectangles, thirteen pixels apart, and the outer
+     * two carrying the identical 14px radius. Concentric corners only look right when
+     * the inner radius is the outer radius minus the gap; at equal radii the two arcs
+     * pinch and the inner box reads as rounder than the thing containing it.
+     *
+     * The two middle cards were carrying no information — the panel above them and the
+     * scroll window below them were already doing the framing — so they give up their
+     * chrome and become what they always were: layout containers. What is left is the
+     * panel (--r-lg) and, inset well inside it, the viewport (--r-md). Smaller radius,
+     * further in: the nesting now reads correctly, and the list gains 26px of width.
+     */
+    #studentsTable > .panel,
+    #studentsByDiv > .panel{
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+    /* A division card is a real card and keeps its frame, but it is nested one level
+       inside the panel, so it steps down a radius rather than repeating --r-lg. */
+    #divScroll > [data-divpanel]{ border-radius: var(--r-md); }
+
+    /* Which view is on screen. An attribute rather than an inline display, so the
+       anchored layout below can make whichever one is showing a flex column without
+       JS having to know that it wants to be one. */
+    #studentsRoot[data-view="table"] #studentsByDiv,
+    #studentsRoot[data-view="summary"] #studentsTable{ display: none; }
+
+    /*
+     * Anchored list.
+     *
+     * The panel is capped to what is left of the viewport and only its rows scroll
+     * inside it, instead of the whole page scrolling past a stack of sticky bands.
+     * The view toggle, the search box and the counts are then simply the panel's
+     * header — always on screen because they are never scrolled, rather than because
+     * they are pinned over something that is.
+     *
+     * --listMaxH is measured: it is the room between the top of this panel and the
+     * bottom of the window, less the space the fixed action bar is already reserving.
+     *
+     * On at every size. It used to be held back below 640px wide or 420px tall, and
+     * again by a measured floor, on the reasoning that a scroll region inside a page
+     * that also scrolls is a poor trade on a phone. What that traded away was the
+     * thing the layout is for: the view toggle, the search and the counts stayed on
+     * screen at a desk and scrolled away on a phone, which is where a roster is
+     * longest and the header hardest to get back to. So the list is anchored at every
+     * size, and a narrow window scrolls the frame sideways rather than taking it away.
+     *
+     * --listMaxH still comes from measurement, because the header above the panel is
+     * taller when the setup bar wraps and no media query can see that. The one number
+     * left is a floor under it: a window too short to seat the frame's own chrome and
+     * a row or two would otherwise cap the panel at something unusable, so below that
+     * the cap stops shrinking and the page scrolls to reach the rest.
+     */
+    #studentsPanel{
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      max-height: var(--listMaxH, none);
+    }
+    /* the panel's own header now, not something pinned over the page */
+    #studentsPanel > .listBar{ position: static; }
+    #studentsRoot{
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    #studentsRoot[data-view="summary"] #studentsByDiv,
+    #studentsRoot[data-view="table"] #studentsTable{
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    /* the two scroll regions: division cards in Summary, rows in Table */
+    #divScroll,
+    #studentsRoot .tableViewport{
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+    }
+    /*
+     * No rubber-band on the box that holds the pinned headings.
+     *
+     * Pull past the end of this scroller on a trackpad and macOS stretches it: the
+     * scroll offset runs beyond its own maximum for the length of the bounce, and the
+     * browser answers by translating everything inside, the sticky headings with it.
+     * They are dragged off the top of the frame and clipped, so the one row that is
+     * never meant to leave is the row that leaves.
+     *
+     * "contain" is not enough. It stops the bounce spreading to the page but keeps the
+     * local one, which is the half doing the damage. "none" is what drops it.
+     *
+     * Both axes, not just the one that broke. Sideways has nothing pinned to it, so it
+     * had no glitch to fix, but a table that stretches at one end and not the other is
+     * a table that behaves two ways, and the narrow layout scrolls this box sideways
+     * often enough for the difference to show. It also settles the other thing a
+     * horizontal scroller does on this trackpad: a pull past the last column can no
+     * longer carry on into the browser's own swipe-to-go-back, which on a page holding
+     * an unsaved roster is a bad way to find out the gesture was still live.
+     *
+     * Nothing is lost with it gone: the action bar below is fixed rather than scrolled
+     * to, so the page has almost no travel of its own to chain into, and on a window
+     * short enough to have some, that travel is a few tens of pixels of padding.
+     */
+    #studentsRoot .tableViewport{ overscroll-behavior: none; }
+    /* The frame moves from the table to the box the table is looked at through, so
+       the rounded rectangle is the window rather than the sheet behind it — square
+       corners the moment you scrolled off either end otherwise.
+
+       It sits one level out from the scroller, on the box that does not move. That is
+       what lets the scroller be masked at its edges without the mask eating the frame
+       with it: the fade is inside the border, and the border is on the parent. */
+    #studentsRoot .tableScroll{
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--panel2);
+      overflow: hidden;   /* so the square-cornered scroller inside is clipped round */
+    }
+    #studentsRoot .tableViewport{
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+    #studentsRoot .tableViewport table{
+      border: 0;
+      border-radius: 0;
+    }
+    /*
+     * The rows scroll inside their own box, so the headings pin to that box's top
+     * rather than to a computed spot down the window. .tableViewport is in the
+     * selector to outrank the base rule, which sets the window-relative offset and,
+     * being further down the sheet, would otherwise win on source order.
+     *
+     * The band above the heading is a cover, not decoration. A sticky table cell
+     * here paints its background a few pixels below where its box actually is —
+     * layout says the heading is flush with the top of the scroller and hit-testing
+     * agrees, but the rows sliding under it show through the difference: the bottom
+     * of a name, of a division pill, of the digits in an ID, in a strip along the
+     * top of the frame.
+     *
+     * The cover used to be a box-shadow offset straight up. Six pixels first,
+     * measured off the gap as it looked at the time; then sixty-four, when the gap
+     * came back — it moves with the browser's zoom, with the row height under the
+     * current density, and with whatever rounding the compositor is doing that day,
+     * so no cover fitted to one reading of it survives the next. The second number
+     * was reasoned as "taller than the gap can ever be", but an offset shadow is not
+     * taller than anything: it is a copy of the cell's own box, moved. Offset it by
+     * more than the heading's height and its lower edge clears the cell's top edge
+     * entirely — sixty-four pixels of cover floating thirty-five above the strip it
+     * was drawn to hide, which is why every scroll position leaked. Spread would pull
+     * it back down, but spread grows sideways as well, and the headings paint in
+     * order: the cover on FAMAT ID would come down over "Last".
+     *
+     * So the cover is its own box, standing on the cell's top edge rather than
+     * offset from it. It cannot miss the strip, because it starts where the strip
+     * ends, whatever the gap measures that day; its height is still free for the
+     * old reason, the scroller clipping everything above the heading; and being the
+     * cell's own child it is the width of that cell and no wider, so it covers rows
+     * without reaching the heading beside it.
+     */
+    html[data-stickyhead="1"] #studentsRoot .tableViewport tbody tr:first-child th{
+      /* restated because the narrow-width rule below turns it off, and that rule was
+         written when the only scrollport was the window; here it is this box */
+      position: sticky;
+      top: 0;
+      box-shadow: 0 1px 0 var(--line2);
+    }
+    /* Sticky is what makes the cell the box this is measured from, so this rule and
+       the one above belong together. `bottom: 100%` is the cell's top edge, painted
+       where the cell is painted rather than where layout says it sits — the whole
+       point — and the cover only ever reaches upward from there, so the heading's
+       own label is never under it. */
+    html[data-stickyhead="1"] #studentsRoot .tableViewport tbody tr:first-child th::before{
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 100%;
+      height: 64px;
+      background: var(--thBg);
+    }
+
+    .listBar{
+      position: sticky;
+      top: var(--pageHeadH, 0px);
+      z-index: 32;
+      /* A row, not a grid: the heading and the view toggle are all that is left up
+         here now that the search has gone down to the bar above the table, and two
+         tracks for one item was a gap looking for something to separate. */
+      display: flex;
+      align-items: center;
+      gap: var(--s3);
+      /* The negative top margin pulls the bar's own padding over the panel's, so its
+         content still sits one inset down while its background reaches the panel edge
+         and covers what scrolls under it. The space below is the panel's gap. */
+      padding: var(--s3) 0;
+      margin: calc(var(--s3) * -1) 0 0;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line2);
+    }
+    /* The bar above the table. The search takes whatever the buttons do not, and keeps
+       taking it down to nothing rather than pushing them onto a second line — two 28px
+       buttons and a gap is all they ever need, and a search box narrower than its own
+       placeholder is still a search box. */
+    .listTools{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+    }
+    /* Basis zero, not auto: the field's own content width counts the 124px of padding
+       it opens up for the match count, and a basis that asked for that width pushed
+       the buttons out of the row the moment anything was typed. The buttons are the
+       fixed part and say so; everything left over is the field's. */
+    .listTools .listSearchWrap{ flex: 1 1 0; }
+    .listTools > .row{ flex: 0 0 auto; flex-wrap: nowrap; }
+
+    .listSearchWrap{ position: relative; display: flex; min-width: 0; }
+    /* The same height as the two buttons beside it. --ctlH is the page-level control
+       height and is right for a field standing on its own; here the field is one of
+       three things on a toolbar and the other two are 28px pills, so at 34px the row
+       had two controls disagreeing about where the line was. Scoped to this box —
+       every field outside a toolbar keeps the taller default. */
+    input.searchInput{
+      width: 100%;
+      /* `input[type="text"]` outranks a bare class, so the element is named here to
+         match it and win on source order. */
+      min-height: var(--h-sm);
+      min-width: 0 !important;
+    }
+    /* Digits-only boxes, wherever they are.
+       One ghost shape and one face: a "#" per slot you can type into, set in the same
+       mono the table's ID column uses. It was a sample value in each — "4050", "151" —
+       which reads as a default that is about to be used rather than as an empty box,
+       and three different faces between them. A row of hashes is not mistakable for
+       content, and counting them tells you how many digits are wanted. */
+    input.numField,
+    input.divTestIdInput,
+    input.topicCodeInput{
+      /* named by element, because `input[type="text"]` sets `font: inherit` and would
+         otherwise outrank a bare class and put these back on the system face */
+      font-family: var(--mono);
+      letter-spacing: 0.04em;
+    }
+    input.numField::placeholder,
+    input.divTestIdInput::placeholder,
+    input.topicCodeInput::placeholder{ letter-spacing: 0.12em; }
+
+    /* the count rides inside the field, so the field never resizes as you type */
+    #searchCount{
+      position: absolute;
+      top: 50%;
+      right: var(--s2);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .listSearchWrap[data-has-query="1"] .searchInput{ padding-right: 124px; }
+
+    /* The two buttons say what they are as soon as there is room to.
+       #studentsPanel is the query container, so the threshold is the bar's own width
+       rather than the window's — the list is capped and inset, and at the widest page
+       setting it is a long way off the viewport.
+
+       The pair, labelled, costs 203px of the bar. The threshold is that plus what the
+       field is left with, and the field's share is the only judgement in it: 130px,
+       which is about eighteen characters of the placeholder and more than a name needs
+       to be read back while it is typed. It was 265px, which was cautious to the point
+       of keeping the buttons mute on a bar wide enough for both. Below the threshold
+       they go back to glyphs and the tooltip, which is what they have always been.
+
+       Two thresholds, not one, because the two bars are not the same shape. The table's
+       has a field that has to stay usable; Summary's has three buttons and a count and
+       nothing that stretches, so it labels up as soon as the four of them fit on one
+       line. A shared number would have had one of them wrong. */
+    .miniLabel{ display: none; }
+    /* labelled chrome, wherever a bar decides its buttons have earned it: the square
+       icon-only sizing is a floor, not a width, so the button grows around the two */
+    .listToolsBtns .mini.miniIcon,
+    .summaryTools .mini.miniIcon{ padding: 0 var(--s1); }
+    @container (min-width: 333px){
+      .listToolsBtns .miniLabel{ display: inline; }
+      .listToolsBtns .mini.miniIcon{ padding: 0 var(--s3); gap: var(--s2); }
+    }
+    @container (min-width: 520px){
+      .summaryTools .miniLabel{ display: inline; }
+      .summaryTools .mini.miniIcon{ padding: 0 var(--s3); gap: var(--s2); }
+    }
+    /* Nothing in either bar may wrap onto a second line: below its threshold the row
+       is three glyphs wide and always fits, and above it the threshold is what
+       guarantees it fits. */
+    .summaryTools{ flex-wrap: nowrap; }
+
+    table{
+      width: 100%;
+      /*
+       * Separate, not collapsed, because the column headers are sticky. Collapsed
+       * borders belong to the table rather than to the cells that share them, so they
+       * do not travel with a cell that has been stuck to the top of the viewport: the
+       * header's leading edge is left unpainted and the rows sliding underneath show
+       * through it as a sliver. Cells own their borders here instead.
+       *
+       * Nothing about the ruling changes. Only bottom borders are set below, so each
+       * boundary between two rows still gets exactly one line, and border-spacing is
+       * zeroed so the cells stay flush the way collapsing had them.
+       */
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--panel2);
+      overflow: clip;
+    }
+    th, td{
+      padding: var(--rowPadY) var(--s2);
+      border-bottom: 1px solid var(--line2);
+      vertical-align: middle;
+    }
+    th{
+      text-align: left;
+      padding-top: var(--s2);
+      padding-bottom: var(--s2);
+      background: var(--thBg);
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+    tr:last-child td{ border-bottom: none; }
+
+    #studentsRoot table{ table-layout: fixed; }
+
+    /* Column widths.
+       ------------------------------------------------------------------
+       An ID is eight digits, a team is one, Added is one glyph: their size is
+       known and should not drift with the window. A fixed table layout, though,
+       hands leftover width out in proportion to every column, so a plain `20%`
+       on the names quietly inflated the ID box from 152px to 246px on a wide
+       screen. The flexible columns therefore claim the leftover explicitly —
+       each takes a share of (100% - the fixed columns) — which adds up to the
+       whole table and leaves nothing to redistribute.
+
+       The three flexible ones are percentages that add up to 100%. Since the
+       fixed columns take their pixels on top of that, the specified widths always
+       exceed the table and there is no leftover to hand out: the pixel columns keep
+       their exact size and the percentage columns divide the remainder in their own
+       ratio. (calc() is not an option here — a `width: calc(...)` on a <col> is
+       dropped, and the column silently falls back to an equal share.) */
+    #studentsRoot{
+      --wGrip: 24px;
+      --wAct: 116px;   /* three 26px rings, the gaps between them, and the inset */
+      --wSel:  40px;
+      /* The starting figure only. syncDivColumnWidth measures the pills this
+         competition actually draws and writes the answer back over this as an inline
+         --wDiv, so the column fits Theta, Alpha and Mu at the State convention instead
+         of holding room for a word only the regular season uses.
+
+         What is left here is what the table is built with before that first
+         measurement lands, and what it falls back to if the measurement cannot run:
+         "Precalculus", the longest label any preset produces, whose pill measures
+         104.5px inside the cell's padding, plus a little air.
+
+         Density-scaled for the same reason the ID column is: the inset that lines this
+         column up with the names grows with the row padding, while the pill's text does
+         not, so the column has to give or "Precalculus" loses its tail on the roomier
+         settings. 117px is the compact figure; the term adds back exactly what the
+         wider inset takes. */
+      --wDiv: calc(117px + (var(--rowPadY) - 4px));
+      /* Sized backwards from the ID box rather than picked: the box fills the cell, so
+         its width is this minus the cell's padding on both sides and the column rule.
+         Holding it at 81px lands between the eight-slot run it used to hug and the full
+         96px column it grew to. The padding term is what keeps the box a constant width
+         while the inset around it grows with density — the digits are the same size at
+         every density, so it is the column that should give, not them. */
+      --wId:   calc(90px + (var(--rowPadY) - 4px) * 2);
+      --wTeam: 62px;
+      --wInc:  62px;   /* "Added" measures 42px, so it sits in a Team-sized column */
+
+      /*
+       * The two name fields and the Test chip are sized by what they have to *show*,
+       * not by a pixel count, because the row font grows with the density and a
+       * constant width would mean a constant number of pixels holding fewer and fewer
+       * characters. A pixel floor set at one density is a different reading at the
+       * other two — the old flat 782/860 floors lost about half a character a step.
+       *
+       * So the floor is split in two. Everything in the cell that is not type is the
+       * same at every density: the column rule (1px), the cell's own padding either
+       * side, and the control's border and padding (1 + 8 a side). The rest is text,
+       * and it is written as a multiple of the row font, so it is the same reading in
+       * whatever size that density sets.
+       *
+       * 4.192 and 9.735 are the compact reading — 54.5px and 126.6px of 13px type,
+       * which is what a name field and a Test chip show there today. Cozy and
+       * comfortable now show the same words in their own size instead of fewer.
+       */
+      --wCellChrome: calc(19px + 2 * var(--rowPadY));
+      --wNameMin:    calc(var(--wCellChrome) + var(--rowFont) * 4.192);
+      --wTestMin:    calc(var(--wCellChrome) + var(--rowFont) * 9.735);
+
+      /* The seven columns whose width is known, for the floors below to add up. Built
+         from the same tokens rather than restated as a number, so a column that is
+         turned off below takes itself out of the floor too. */
+      --wFixed: calc(var(--wGrip) + var(--wSel) + var(--wDiv) + var(--wId)
+                     + var(--wTeam) + var(--wInc) + var(--wAct));
+    }
+
+    /* Where the competition re-bubbles the Division Number, the cell shows the ID the
+       sheet will carry, with that digit in the accent color to mark it as derived
+       rather than typed. Focus the field and the stored roster ID comes back, which
+       is what you actually edit — and what a switch back to a plain competition
+       restores. Same eight characters either way, so the column does not move. */
+    .idSwap{
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: flex-start;
+      white-space: pre;
+      overflow: hidden;
+      pointer-events: none;
+      user-select: none;
+      z-index: 2;
+    }
+    /* color only: a heavier weight re-cuts the glyph and the digits stop lining up
+       with the input's own text underneath */
+    .idSwap .swapDigit{ color: var(--accentInk); }
+    .idFieldWrap[data-remapped="1"]:not(:focus-within) .idSwap{ display: flex; }
+    /* The overlay stands in for every layer under it, segments included — but only the
+       ones under it: matched loosely, this also blanks the overlay's own segments. */
+    .idFieldWrap[data-remapped="1"]:not(:focus-within) .cellInput[data-field="id"],
+    .idFieldWrap[data-remapped="1"]:not(:focus-within) .cellInput[data-field="idnum"],
+    .idFieldWrap[data-remapped="1"]:not(:focus-within) .idField > .idSeg{ color: transparent; }
+
+    /* The measuring bench. Fixed, so it can never add to the page's scrollable area;
+       hidden, so it is never painted; nowrap and uncapped, so each pill reports the
+       width it wants rather than the width some column would give it. */
+    #divWidthProbe{
+      position: fixed;
+      top: 0;
+      left: -9999px;
+      visibility: hidden;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #divWidthProbe .divPill{ max-width: none; }
+
+    #studentsRoot col.stuColGrip{ width: var(--wGrip); }
+    #studentsRoot col.stuColAct{ width: var(--wAct); }
+    #studentsRoot col.stuColSel{ width: var(--wSel); }
+    #studentsRoot col.stuColDiv{ width: var(--wDiv); }
+    #studentsRoot col.stuColId{ width: var(--wId); }
+    #studentsRoot col.stuColTeam{ width: var(--wTeam); }
+    #studentsRoot col.stuColInc{ width: var(--wInc); }
+    /* A test name is usually longer than either half of a name on its own, and these
+       shares are that difference exactly: each is its column's floor over the three
+       floors added up, so at the minimum width every column lands on the reading the
+       tokens asked for. The ratio shifts a little between densities because the chrome
+       inside a cell does not scale with the type, which is why there is a set per
+       density rather than one — 25.745/48.510 compact, 26.074/47.853 cozy,
+       26.355/47.291 comfortable. Above the floor they go on dividing the extra, so a
+       wide table still gives the Test column the larger share of it.
+
+       With no Test column the two names split what is left evenly, which is their
+       floor at any density and needs no per-density figure. */
+    #studentsRoot col.stuColFirst,
+    #studentsRoot col.stuColLast{ width: 25.745%; }
+    #studentsRoot col.stuColTopic{ width: 48.510%; }
+    html[data-density="cozy"] #studentsRoot col.stuColFirst,
+    html[data-density="cozy"] #studentsRoot col.stuColLast{ width: 26.074%; }
+    html[data-density="cozy"] #studentsRoot col.stuColTopic{ width: 47.853%; }
+    html[data-density="comfortable"] #studentsRoot col.stuColFirst,
+    html[data-density="comfortable"] #studentsRoot col.stuColLast{ width: 26.355%; }
+    html[data-density="comfortable"] #studentsRoot col.stuColTopic{ width: 47.291%; }
+    html.no-topic-tests #studentsRoot col.stuColFirst,
+    html.no-topic-tests #studentsRoot col.stuColLast{ width: 50%; }
+    #studentsRoot .nameCol, #studentsRoot .idCol{ min-width: 0; }
+
+    /* Every column is divided from the next, so the list reads as a grid of cells
+       rather than four controls floating at the right-hand end. */
+    #studentsRoot td + td,
+    #studentsRoot th + th{ border-left: 1px solid var(--line2); }
+    /* ...but never against the panel edge, where a hidden first column would
+       otherwise leave the border doubling the panel's own */
+    #studentsRoot .selCol,
+    #studentsRoot .gripCol + .selCol{ border-left: none; }
+
+    #studentsRoot td.center, #studentsRoot th.center{
+      padding-left: var(--s1);
+      padding-right: var(--s1);
+    }
+    #studentsRoot td:last-child, #studentsRoot th:last-child{ padding-right: var(--s3); }
+    #studentsRoot th:first-child, #studentsRoot td:first-child{ padding-left: var(--s3); }
+
+    /* A field sits in its cell with the same gap all the way round: the vertical gap
+       is the row padding, so the horizontal one is too. The default cell padding is
+       wider than that and left the boxes looking inset on the sides only. */
+    #studentsRoot td.nameCol,
+    #studentsRoot td.topicCol,
+    #studentsRoot td.idCol{
+      padding-left: var(--rowPadY);
+      padding-right: var(--rowPadY);
+    }
+
+    /* A header sits over that field, whose text is inset by the field's own border
+       and padding. Repeat the inset on the header or the label floats left of the
+       column it names. The centered columns are unaffected. */
+    #studentsRoot th.nameCol,
+    #studentsRoot th.topicCol{ padding-left: calc(var(--rowPadY) + 1px + var(--s2)); }
+
+    /* Division is the one left-aligned column with no field in it — just a pill — so
+       nothing inside the cell was adding the border-and-padding step that puts every
+       other column's text where it sits. Its header and its pill agreed with each
+       other and disagreed with the rest of the table, reading 5px tight against the
+       divider at compact density and further out of step as the rows loosen. Spelling
+       the same inset out here lines it up with the names and keeps the two in step,
+       because they are given it together. */
+    #studentsRoot th.divCol,
+    #studentsRoot td.divCol{ padding-left: calc(var(--rowPadY) + 1px + var(--s2)); }
+
+    /* The pill is an inline-block, so it was sitting on the cell's text baseline rather
+       than in the middle of the row — 2px high at every density, which is enough to see
+       against the name beside it. Zeroing the line height takes the invisible text strut
+       out of the line box, leaving the pill as the only thing in it for the cell's own
+       vertical-align to center. Done this way rather than with vertical-align on the
+       pill, which is measured off the parent's x-height and so drifts the moment the
+       font does. Nothing here sets type — the pill carries its own line-height. */
+    #studentsRoot td.divCol{ line-height: 0; }
+
+    /* The same strut, the same fix, for every other cell that holds a control.
+       ------------------------------------------------------------------
+       Grip, checkbox, Team and Added are all inline-level boxes, so each sits on its
+       cell's baseline and is centered as part of a line box that still contains the
+       cell's invisible text strut. Actions are centered by a different mechanism
+       entirely — .rowActs is display:flex, so it is block-level, fills the cell and is
+       centered exactly — and the two only agree while the strut happens to fit inside
+       the control's own extents above and below the baseline. That depends on the font
+       and on the density, which is not something to leave to chance across three
+       densities and a font the reader can change.
+
+       Zeroing the line height removes the strut from the line box, so these cells
+       center the control itself, the way the action cell already does. Where the strut
+       already fitted this changes nothing; where it did not, it takes the control off
+       the baseline and puts it on the middle line. Each control carries its own
+       line-height, so nothing here collapses.
+
+       The Test cell needs none of this: .topicPick is display:flex too. */
+    #studentsRoot td.gripCol,
+    #studentsRoot td.selCol,
+    #studentsRoot td.teamCol,
+    #studentsRoot td.incCol{ line-height: 0; }
+    #studentsRoot th.idCol{ text-align: center; padding-left: var(--s1); padding-right: var(--s1); }
+

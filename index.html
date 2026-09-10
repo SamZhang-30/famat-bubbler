@@ -1,0 +1,1458 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <!-- without this a phone lays the page out at 980px and zooms out, so the
+       narrow-width rules further down never get a chance to apply -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enhanced FAMAT Bubbler</title>
+  <script src="js/00-boot.js"></script>
+
+  <script src="vendor/pdf-lib-1.17.1.min.js" defer></script>
+  <script src="vendor/fontkit-1.1.1.umd.min.js" defer></script>
+  <script src="fonts/embedded-fonts.js" defer></script>
+  <link rel="stylesheet" href="css/01-tokens.css" />
+  <link rel="stylesheet" href="css/02-base.css" />
+  <link rel="stylesheet" href="css/03-surfaces.css" />
+  <link rel="stylesheet" href="css/04-controls.css" />
+  <link rel="stylesheet" href="css/05-fields.css" />
+  <link rel="stylesheet" href="css/06-badges-chips.css" />
+  <link rel="stylesheet" href="css/07-segmented.css" />
+  <link rel="stylesheet" href="css/08-app-header.css" />
+  <link rel="stylesheet" href="css/09-setup-bar.css" />
+  <link rel="stylesheet" href="css/10-menu-tabs.css" />
+  <link rel="stylesheet" href="css/11-save-slots.css" />
+  <link rel="stylesheet" href="css/12-answer-columns.css" />
+  <link rel="stylesheet" href="css/13-student-list.css" />
+  <link rel="stylesheet" href="css/14-sort-headings.css" />
+  <link rel="stylesheet" href="css/15-row-drag.css" />
+  <link rel="stylesheet" href="css/16-row-actions.css" />
+  <link rel="stylesheet" href="css/17-alerts.css" />
+  <link rel="stylesheet" href="css/18-toast.css" />
+  <link rel="stylesheet" href="css/19-popovers-modals.css" />
+  <link rel="stylesheet" href="css/20-filtering.css" />
+  <link rel="stylesheet" href="css/21-settings.css" />
+  <link rel="stylesheet" href="css/22-custom-editor.css" />
+  <link rel="stylesheet" href="css/23-topic-tests.css" />
+  <link rel="stylesheet" href="css/24-permission-slips.css" />
+  <link rel="stylesheet" href="css/25-help.css" />
+  <link rel="stylesheet" href="css/26-optional-columns.css" />
+  <link rel="stylesheet" href="css/27-narrow.css" />
+  <link rel="stylesheet" href="css/28-refinements.css" />
+</head>
+
+<body>
+  <!-- Every row of the list contributes nine tab stops, so a 200-student roster puts
+       roughly 1,850 of them between the top of the page and Create PDF, which lives
+       in the footer and is therefore last in source order. This is the way past. -->
+  <a class="skipLink" href="#stickyBar" data-action="skipToActions">Skip to the Action Bar</a>
+
+  <!-- The page header is pinned, so the title, the competition it is set to and the
+       setup menus stay reachable however far down a long roster you are. Full-bleed
+       like the sticky footer below: its own inner box carries the page width. -->
+  <div class="pageHead" id="pageHead">
+    <div class="pageHeadInner">
+      <div class="appHeader">
+      <div class="appHeaderLeft">
+        <div>
+          <h1 class="appTitle">Enhanced FAMAT Bubbler</h1>
+          <div class="smallNote"><a href="help.html" target="_blank" rel="noopener">How to Use</a> <span id="saveStatus" role="status" aria-live="polite"></span></div>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="iconBtn" data-action="openShortcuts" title="Keyboard shortcuts" aria-label="Keyboard Shortcuts">
+          <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="1.2" y="3.6" width="13.6" height="8.8" rx="1.8"/><path d="M4.2 6.4h.01M6.6 6.4h.01M9 6.4h.01M11.4 6.4h.01M4.2 9.6h6.8"/></svg>
+        </button>
+        <button type="button" class="iconBtn" data-action="toggleTheme" id="btnTheme" title="Switch between light and dark" aria-label="Switch between light and dark">
+          <svg class="glyph icon-sun" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="3.1"/><path d="M8 1.4v1.5M8 13.1v1.5M2.7 8H1.2M14.8 8h-1.5M3.9 3.9l1.1 1.1M11 11l1.1 1.1M12.1 3.9 11 5M5 11l-1.1 1.1"/></svg>
+          <svg class="glyph icon-moon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M13.6 9.9A5.9 5.9 0 1 1 6.1 2.4a5 5 0 0 0 7.5 7.5z"/></svg>
+        </button>
+        <button type="button" class="iconBtn" data-action="openSettings" title="Settings" aria-label="Settings">
+          <!-- a toothed gear, not a circle with spokes: the spoked version was
+               indistinguishable from the sun in the theme button beside it -->
+          <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M6.45 3.51L6.79 1.77L9.21 1.77L9.55 3.51L10.08 3.73L11.55 2.74L13.26 4.45L12.27 5.92L12.49 6.45L14.23 6.79L14.23 9.21L12.49 9.55L12.27 10.08L13.26 11.55L11.55 13.26L10.08 12.27L9.55 12.49L9.21 14.23L6.79 14.23L6.45 12.49L5.92 12.27L4.45 13.26L2.74 11.55L3.73 10.08L3.51 9.55L1.77 9.21L1.77 6.79L3.51 6.45L3.73 5.92L2.74 4.45L4.45 2.74L5.92 3.73Z"/><circle cx="8" cy="8" r="2.15"/></svg>
+        </button>
+      </div>
+    </div>
+
+      <div class="setupBarWrap">
+      <div class="setupBar" data-sidescroll="overlay">
+
+      <!-- ---------- Competition ----------
+           Lives in the setup bar rather than up beside the title: it is a setup menu
+           like the five that follow, and giving it its own 40px rounded-rectangle in
+           the header meant two controls doing one job in two shapes, twenty pixels
+           apart. Same pill, same icon, same state chip as Topic Tests. The divider
+           after it keeps the reading "this setting, then the menus that answer to it". -->
+      <button type="button" class="setupChip" id="btnCompetition" data-action="openCompetition" title="Choose which competition these sheets are for">
+        <svg class="menuIcon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 2.4h6v3.4a3 3 0 0 1-6 0z"/><path d="M5 3.4H3.2v1a2 2 0 0 0 2 2M11 3.4h1.8v1a2 2 0 0 1-2 2"/><path d="M8 8.8v2.6M5.6 13.6h4.8"/></svg>
+        Competition
+        <span class="chipState" data-on="1" id="compValue">Regional / Statewide</span>
+      </button>
+      <span class="setupDivide" aria-hidden="true"></span>
+
+      <!-- ---------- Drafts ---------- -->
+      <details class="topSection" id="secDraftSlots">
+        <summary>
+          <svg class="menuIcon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.6 3.6a1.4 1.4 0 0 1 1.4-1.4h6l3.4 3.4v6.8a1.4 1.4 0 0 1-1.4 1.4H4a1.4 1.4 0 0 1-1.4-1.4z"/><path d="M5.4 2.2v3.6h4.4M5.4 13.8V9.4h5.2v4.4"/></svg>
+          Drafts
+        </summary>
+        <div class="topSectionBody" data-sidescroll="mask" data-vscroll="mask">
+          <div class="menuHead">
+            <div class="menuTitle">Drafts</div>
+            <div class="menuSub">Your workspace saves itself as you go. These four slots are checkpoints on top of
+            that. Each one holds the whole workspace.</div>
+          </div>
+          <div class="slotRow" id="draftSlots"></div>
+          <p class="smallNote">To start over, use <button type="button" class="textLink" data-action="openSettings">Settings → Reset Everything</button>. Saved drafts are kept.</p>
+        </div>
+      </details>
+
+      <!-- ---------- Roster ---------- -->
+      <details class="topSection" id="menuRoster">
+        <summary>
+          <svg class="menuIcon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 2.4h9.6v11.2H3.2z"/><path d="M5.6 5.4h4.8M5.6 8h4.8M5.6 10.6h3"/></svg>
+          Add Students
+        </summary>
+        <div class="topSectionBody" data-sidescroll="mask" data-vscroll="mask">
+          <div class="tabStrip" role="tablist" aria-label="Add Students">
+            <button type="button" class="tabBtn" role="tab" data-tab="secEnrollment" aria-selected="true">Roster</button>
+            <button type="button" class="tabBtn" role="tab" data-tab="secAddStudent" aria-selected="false">Manual</button>
+          </div>
+
+          <div class="tabPanel" id="secEnrollment" role="tabpanel">
+            <div class="menuHead">
+              <div class="menuTitle">Paste Your Enrollment List</div>
+              <div class="menuSub">Paste the roster PDF from the FAMAT site. This automatically imports names, IDs, divisions, and
+              school name.</div>
+            </div>
+            <label class="srOnly" for="enrollment">Roster text</label>
+            <textarea id="enrollment" rows="9" cols="10" spellcheck="false" placeholder="Roster: Example High School #xxxx&#10;LastName, FirstName Algebra I xxxxyyy11 xxxxyyy12 xxxxyyy13&#10;LastName, FirstName Geometry xxxxyyy21 xxxxyyy22 xxxxyyy23&#10;LastName, FirstName Algebra II xxxxyyy31 xxxxyyy32 xxxxyyy33&#10;LastName, FirstName Precalculus xxxxyyy41 xxxxyyy42 xxxxyyy43&#10;LastName, FirstName Calculus xxxxyyy51 xxxxyyy52 xxxxyyy53&#10;LastName, FirstName Statistics xxxxyyy61 xxxxyyy62 xxxxyyy63"></textarea>
+            <div id="rosterImportResult" role="status" aria-live="polite"></div>
+            <div id="rosterSchoolReview" class="importReview" hidden></div>
+            <div class="row" style="margin-top:12px;">
+              <button type="button" class="primary" data-action="readEnrollment">Load Enrollment List</button>
+              <button type="button" class="danger" data-action="clearStudents">Clear Students</button>
+              <div class="smallNote" data-info="caution" style="margin:0;">
+                Loading only imports students not already listed in the table. To preserve your page
+                order, they are added to the bottom of the list. This does not remove existing students
+                or replace existing students. A different school is reviewed before import. To empty the whole list, click
+                &ldquo;Clear Students.&rdquo;
+              </div>
+            </div>
+          <div class="savedRosterSection" id="secSavedRosters">
+            <div class="menuHead">
+              <div class="menuTitle">Saved Rosters</div>
+              <div class="menuSub">Save up to three slots holding just the pasted rosters, which survive a refresh. To save an
+              entire workspace, including teams, topics, and who's added, use Drafts instead.</div>
+            </div>
+            <div class="slotRow" id="slots"></div>
+          </div>
+          </div>
+
+          <div class="tabPanel" id="secAddStudent" role="tabpanel" hidden>
+            <div class="menuHead">
+              <div class="menuTitle">Add One Student by Hand</div>
+              <div class="menuSub">FAMAT IDs are made up of School ID (4 digits), Student Number (3 digits), and Roster Level (1
+              digit, 1&ndash;6).</div>
+            </div>
+            <div class="row" style="align-items:flex-end; gap:12px;">
+              <label class="field">
+                <span class="fieldLabel">First Name</span>
+                <input type="text" id="nativeAddFirst" placeholder="optional" style="width:190px;">
+              </label>
+              <label class="field">
+                <span class="fieldLabel">Last Name</span>
+                <input type="text" id="nativeAddLast" placeholder="optional" style="width:190px;">
+              </label>
+            </div>
+            <div class="row" style="align-items:flex-end; gap:12px; margin-top:12px;">
+              <label class="field">
+                <span class="fieldLabel">School ID</span>
+                <input type="text" id="addSchoolId4" class="numField" inputmode="numeric" maxlength="4" placeholder="####" style="width:100px;">
+              </label>
+              <label class="field">
+                <span class="fieldLabel">Student #</span>
+                <input type="text" id="nativeStudent3" class="numField" inputmode="numeric" maxlength="3" placeholder="###" style="width:88px;">
+              </label>
+              <label class="field">
+                <span class="fieldLabel">Roster Level</span>
+                <select id="nativeAddDivision" style="width:180px;">
+                  <option value="1">Algebra I (1)</option>
+                  <option value="2">Geometry (2)</option>
+                  <option value="3">Algebra II (3)</option>
+                  <option value="4">Precalculus (4)</option>
+                  <option value="5">Calculus (5)</option>
+                  <option value="6">Statistics (6)</option>
+                </select>
+              </label>
+              <button type="button" class="primary" data-action="nativeAddStudent">Add Student</button>
+            </div>
+            <div class="row" style="margin-top:14px;">
+              <div class="smallNote" style="margin:0;">Everyone at a school shares one School ID, so it is only typed once. Fill it in for your first
+              student and PDF Setup → School keeps it from then on. The box here will then turn read-only and
+              School ID can only be changed in that menu.</div>
+            </div>
+            <div class="error" id="nativeAddError" style="margin-top:10px;"></div>
+          </div>
+
+
+        </div>
+      </details>
+
+      <!-- ---------- Permission slips ----------
+           Named for the paperwork it stands in for, and given a slip-with-a-tick icon,
+           so it is not mistaken for the Filter button over the table. That one is a
+           lens on what you can see; this one decides who is in the PDF. -->
+      <details class="topSection" id="secFilter">
+        <summary>
+          <svg class="menuIcon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.4 2.2h9.2v11.6H3.4z"/><path d="M5.8 5h4.4M5.8 7.2h2.4"/><path d="m5.8 10.4 1.6 1.6 3.2-3.6"/></svg>
+          Permission Slips
+        </summary>
+        <div class="topSectionBody" data-sidescroll="mask" data-vscroll="mask">
+          <div class="menuHead">
+            <div class="menuTitle">Import Permission Slips</div>
+            <div class="menuSub">Paste the names of everyone who is attending the competition, one per line. They are added to
+            the PDF and everyone else is un-added. The full roster is preserved, and imports can be undone.</div>
+          </div>
+
+          <details class="helpDisclosure">
+            <summary><svg viewBox="0 0 14 14" aria-hidden="true" focusable="false" class="discIcon"><path d="M4.5 8.2a3.4 3.4 0 1 1 5 0c-.5.5-.8 1-.9 1.6H5.4c-.1-.6-.4-1.1-.9-1.6z"/><path d="M5.6 11.8h2.8"/></svg>Build This List from a Spreadsheet</summary>
+            <div class="helpDisclosureBody">
+              If your roster lives in a spreadsheet with a checkbox column for who is competing,
+              one formula produces this whole list.
+
+              <span class="formulaBlock">
+                <span class="formulaHead">
+                  <span class="formulaLang">Google Sheets</span>
+                  <button type="button" class="copyBtn" data-copy>Copy</button>
+                </span>
+                <code class="tipFormula">=JOIN(CHAR(10), FILTER(namesRange, checkboxRange))</code>
+              </span>
+
+              <span class="formulaBlock">
+                <span class="formulaHead">
+                  <span class="formulaLang">Excel 365</span>
+                  <button type="button" class="copyBtn" data-copy>Copy</button>
+                </span>
+                <code class="tipFormula">=TEXTJOIN(CHAR(10), TRUE, FILTER(namesRange, checkboxRange))</code>
+              </span>
+
+              <p>
+                Replace <code>namesRange</code> with the column of eligible names and <code>checkboxRange</code>
+                with the checkbox column beside it. For example, <code>B2:B10</code> and
+                <code>D2:D10</code>.
+              </p>
+              <p>
+                <strong>Both ranges must be one column and cover the same rows.</strong> Be sure to include
+                student rows only: a header or totals row comes through as a name, and an offset range may
+                switch on the wrong student.
+              </p>
+            </div>
+          </details>
+
+          <!-- Name order and delimiter used to stand between the explanation above and
+               the box you paste into: two rows of controls, both with a paragraph
+               beside them, that almost every list gets right on the defaults. They
+               pushed the textarea — the only thing anyone comes to this menu to use —
+               below the fold on a short window.
+
+               They are still one press away, and the press is where they are needed:
+               a round button riding the corner of the box itself, so "this did not
+               parse the way I meant" and "here is where to say how it is written" are
+               the same place on screen. -->
+          <div class="field advField" style="margin-top:12px;">
+            <span class="fieldLabel">Names on the Slips</span>
+            <div class="advWrap">
+              <textarea id="filter" rows="10" cols="10" spellcheck="false" aria-describedby="slipAdvancedNote"></textarea>
+              <details class="advPop" id="slipAdvanced">
+                <summary class="advBtn" role="button" aria-label="How these names are written"
+                         title="How these names are written: name order and delimiter">
+                  <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                    <path d="M9.6 2.6a3.2 3.2 0 0 0 4 4L9.9 10.3l-1.7-1.7z"/>
+                    <path d="M7.4 8.6 3.6 12.4l1.7 1.7 3.8-3.8"/>
+                  </svg>
+                </summary>
+                <div class="advBody">
+                      <div class="advTitle">How These Names Are Written</div>
+                  <p class="smallNote" id="slipAdvancedNote" style="margin:0 0 var(--s3);">
+                    The defaults read a plain list correctly. Change these only when a paste comes
+                    back parsed the wrong way round, or split in the wrong place.
+                  </p>
+
+                  <div class="advRow">
+                    <span class="fieldLabel">Names Are Written As</span>
+                    <div class="pillToggle" id="nameOrderToggle" role="group" aria-label="Order the names are written in">
+                      <button type="button" data-action="setNameOrder" data-order="firstlast" aria-pressed="false">First, Last</button>
+                      <button type="button" data-action="setNameOrder" data-order="lastfirst" aria-pressed="true">Last, First</button>
+                    </div>
+                    <div class="smallNote" style="margin:0;">
+                      A line that only matches the other way round is still accepted, and reported as
+                      reversed after the parse.
+                    </div>
+                  </div>
+
+                  <div class="advRow">
+                    <label class="field delimiterField">
+                      <span class="fieldLabel">Delimiter</span>
+                      <input type="text" id="delimiter" value="" placeholder="auto">
+                    </label>
+                    <div class="smallNote" style="margin:0;">
+                      Auto reads comma- and space-separated lists. Type the separator for odd formats
+                      like <code>Last-First</code>, or <code>whitespace</code> to force a split on
+                      spaces, which misreads multi-word names.
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:12px;">
+            <button type="button" class="primary" data-action="filterStudentList">Apply Permission Slips</button>
+            <div class="row" id="filterResult" style="gap:6px;"></div>
+          </div>
+
+          <div class="alert" id="alertFilter">
+            <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.6 15 14H1z"/><path d="M8 6.6v3M8 11.6h.01"/></svg>
+            <div class="alertBody" id="error2"></div>
+          </div>
+        </div>
+      </details>
+
+      <!-- ---------- PDF Setup ---------- -->
+      <details class="topSection" id="menuPdfSetup">
+        <summary>
+          <svg class="menuIcon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.4 1.8h6l3.2 3.2v9.2H3.4z"/><path d="M9.2 1.8V5h3.4"/><path d="M5.8 8.6h4.4M5.8 11h3"/></svg>
+          PDF Setup
+        </summary>
+        <div class="topSectionBody" data-sidescroll="mask" data-vscroll="mask">
+          <div class="tabStrip" role="tablist" aria-label="PDF setup">
+            <button type="button" class="tabBtn" role="tab" data-tab="secSchool" aria-selected="true">School</button>
+            <button type="button" class="tabBtn" role="tab" data-tab="secBubbles" aria-selected="false">Answer Columns</button>
+            <button type="button" class="tabBtn" role="tab" data-tab="secTextFont" aria-selected="false">Text Font</button>
+            <button type="button" class="tabBtn" role="tab" data-tab="secFileName" aria-selected="false">File Name</button>
+          </div>
+
+          <div class="tabPanel" id="secSchool" role="tabpanel">
+            <div class="menuHead">
+              <div class="menuTitle" id="mtSchool">School</div>
+              <div class="menuSub">The school name is printed on every sheet. The ID is checked against each student&rsquo;s first
+              four digits.</div>
+            </div>
+            <label class="field" style="margin-bottom:16px;">
+              <span class="fieldLabel">School Name</span>
+              <input type="text" id="school" placeholder="Example High School" style="width:100%;">
+            </label>
+            <label class="field">
+              <span class="fieldLabel">School ID</span>
+              <div class="schoolIdApplyRow"><input type="text" id="schoolId4" class="numField" inputmode="numeric" maxlength="4" placeholder="####" style="width:120px;"><button type="button" class="mini primary" data-action="applySchoolId" disabled>Apply</button></div>
+            </label>
+            <div class="smallNote" data-tip-anchor="mtSchool">
+              Loading a roster sets this to the most common prefix it finds. Any student whose ID starts
+              differently is flagged in the list. Type a replacement and press Apply to update students whose school ID matches the old one.
+            </div>
+          </div>
+
+          <div class="tabPanel" id="secBubbles" role="tabpanel" hidden>
+            <div class="menuHead">
+              <div class="menuTitle" id="mtBubbles">Answer Columns</div>
+              <div class="menuSub">The nine ID columns on the sheet, left to right. Switch one off and it is left blank on every page.</div>
+            </div>
+            <!-- grouped the way the sheet brackets them: School # | Student # | Level | Team.
+                 getBubblesChecked reads every input under #bubbles in order, so the nesting is safe. -->
+            <div id="bubbles" class="chips">
+              <!-- The frame is on #bubbles and the scrolling is in here, so the fade at
+                   the edges cannot eat the border. Nine boxes do not fit a narrow menu, and
+                   they used to be clipped outright: overflow was hidden, so the ninth column
+                   simply was not reachable. -->
+              <div id="bubblesScroll" class="chipsScroll" data-sidescroll="mask">
+                <div class="bubbleGroup">
+                  <span class="bubbleGroupLabel">School #</span>
+                  <div class="bubbleGroupRow">
+                    <label title="Column 1: first digit of the School ID"><input type="checkbox" checked>1</label>
+                    <label title="Column 2: second digit of the School ID"><input type="checkbox" checked>2</label>
+                    <label title="Column 3: third digit of the School ID"><input type="checkbox" checked>3</label>
+                    <label title="Column 4: fourth digit of the School ID"><input type="checkbox" checked>4</label>
+                  </div>
+                </div>
+                <div class="bubbleGroup">
+                  <span class="bubbleGroupLabel">Student #</span>
+                  <div class="bubbleGroupRow">
+                    <label title="Column 5: first digit of the Student Number"><input type="checkbox" checked>5</label>
+                    <label title="Column 6: second digit of the Student Number"><input type="checkbox" checked>6</label>
+                    <label title="Column 7: third digit of the Student Number"><input type="checkbox" checked>7</label>
+                  </div>
+                </div>
+                <div class="bubbleGroup">
+                  <span class="bubbleGroupLabel">Level</span>
+                  <div class="bubbleGroupRow">
+                    <label title="Column 8: the competition division digit"><input type="checkbox" checked>8</label>
+                  </div>
+                </div>
+                <div class="bubbleGroup">
+                  <span class="bubbleGroupLabel">Team</span>
+                  <div class="bubbleGroupRow">
+                    <label title="Column 9: the Team Number"><input type="checkbox" checked>9</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="smallNote" data-info="caution" data-tip-anchor="mtBubbles">
+              These are <strong>global</strong>: switching a digit off leaves it blank on
+              <strong>every</strong> sheet. Per-student values still apply to the digits left on.
+            </div>
+          </div>
+
+          <div class="tabPanel" id="secTextFont" role="tabpanel" hidden>
+            <div class="menuHead">
+              <div class="menuTitle" id="mtFont">Text Font</div>
+              <div class="menuSub">Font for Name, School and Test. Bubbled ID digits keep their fixed-width font.</div>
+            </div>
+            <label class="field">
+              <span class="fieldLabel">Font family</span>
+              <select id="pdfFontFamily" style="width:260px; max-width:100%;">
+                <option value="Courier">Courier</option>
+                <option value="Helvetica" selected>Helvetica</option>
+                <option value="RobotoCondensed">Roboto Condensed</option>
+                <option value="TimesRoman">Times Roman</option>
+              </select>
+            </label>
+            <label class="field" style="margin-top:12px;">
+              <span class="fieldLabel">Variant</span>
+              <select id="pdfFont" style="width:260px;">
+                <option value="RobotoCondensed">Roboto Condensed</option>
+                <option value="RobotoCondensedBold">Roboto Condensed Bold</option>
+                <option value="Helvetica" selected>Helvetica</option>
+                <option value="HelveticaBold">Helvetica Bold</option>
+                <option value="HelveticaOblique">Helvetica Oblique</option>
+                <option value="HelveticaBoldOblique">Helvetica Bold Oblique</option>
+                <option value="TimesRoman">Times Roman</option>
+                <option value="TimesRomanBold">Times Roman Bold</option>
+                <option value="TimesRomanItalic">Times Roman Italic</option>
+                <option value="TimesRomanBoldItalic">Times Roman Bold Italic</option>
+                <option value="Courier">Courier</option>
+                <option value="CourierBold">Courier Bold</option>
+                <option value="CourierOblique">Courier Oblique</option>
+                <option value="CourierBoldOblique">Courier Bold Oblique</option>
+              </select>
+            </label>
+            <div class="smallNote" data-info="caution" data-tip-anchor="mtFont">
+              Printed text does not wrap. Check long names in the PDF preview.
+            </div>
+          </div>
+
+          <div class="tabPanel" id="secFileName" role="tabpanel" hidden>
+            <div class="menuHead">
+              <div class="menuTitle" id="mtFile">File Name</div>
+              <div class="menuSub">What the generated PDF is called when it lands in your downloads. The
+              <code>.pdf</code> ending is added for you.</div>
+            </div>
+            <label class="field">
+              <span class="fieldLabel">File Name</span>
+              <span class="filenameWrap">
+                <span class="filenameText">
+                  <span id="filenameMeasure" aria-hidden="true">BubbledAnswerSheet</span>
+                  <input type="text" id="filename" value="BubbledAnswerSheet" aria-label="PDF file name, .pdf extension added automatically">
+                </span>
+                <span class="filenameSuffix" aria-hidden="true">.pdf</span>
+              </span>
+            </label>
+            <div id="filenameNormalized" class="smallNote" role="status" hidden></div>
+            <div class="smallNote" data-tip-anchor="mtFile">
+              Left empty, the PDF comes out as <code>BubbledAnswerSheet.pdf</code>.
+            </div>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- ---------- Topic tests ---------- -->
+      <details class="topSection" id="menuTopics">
+        <summary>
+          <svg class="menuIcon" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.6 3.2h10.8v9.6H2.6z"/><path d="M5.2 6.2h5.6M5.2 8.6h3.4"/></svg>
+          Topic Tests
+          <span class="chipState" id="topicChipState">Off</span>
+        </summary>
+        <div class="topSectionBody" data-sidescroll="mask" data-vscroll="mask">
+          <div class="menuHead">
+            <div class="menuTitle">Topic Tests</div>
+            <div class="menuSub">Only the State and National conventions run topic tests. When on, a student can be given a named
+            topic test and the PDF&rsquo;s Test field prints that instead of the division name. There is one list per
+            division this competition runs, plus Open, which belongs to nobody and is offered to everyone.</div>
+          </div>
+          <div class="row" style="justify-content:space-between;">
+            <!-- The switch and its warning travel together, so the hover chip lands
+                 beside the words it qualifies rather than on a line of its own. Same
+                 shape as the two prefix bars below. -->
+            <div class="row" style="gap:8px; min-width:0;">
+              <label class="row" style="gap:8px; color:var(--text); font-weight:700;">
+                <input type="checkbox" id="topicTestsEnabled">
+                Enable Topic Tests
+              </label>
+              <!-- The one consequence of this switch that is not obvious from the
+                   switch: it is not additive. Turning it on takes the division Test
+                   names off every sheet, including the sheets of students you never
+                   give a topic test to, so it is said here rather than discovered on
+                   the printed PDF. -->
+              <div class="smallNote" data-info="caution" style="margin:0;">
+                <strong>This replaces the division Test names for every student, not just the ones
+                you assign a test to.</strong> While topic tests are on, a student&rsquo;s Test field
+                is whatever test they are given, and a student with no test assigned prints a
+                <strong>blank</strong> Test field rather than their division&rsquo;s name. Give them
+                the TBD option below if the sheet should carry the division prefix with the test name
+                left to be written in by hand.
+              </div>
+            </div>
+            <button type="button" class="mini danger" data-action="resetTopicTests">Reset Topic Tests</button>
+          </div>
+          <!-- Both switches live inside the box the topic-tests toggle hides, because
+               neither of them means anything while topic tests are off: a prefix with
+               nothing to prefix, a TBD with nothing to stand in for. -->
+          <div id="topicTestsBox" style="display:none; margin-top:12px;">
+            <div class="topicLegend">
+              <span><strong>Test Name</strong> is what prints in the Test field.</span>
+              <span><strong>Code</strong> is the 3-digit number bubbled on the sheet. Leave it blank to bubble nothing.</span>
+            </div>
+            <div class="topicGrid" id="topicTestGrid"></div>
+            <div class="row topicPrefixBar">
+              <label class="row" style="gap:8px; color:var(--text); font-weight:700;">
+                <input type="checkbox" id="topicPrefixEnabled" checked>
+                Prefix Test Names on the PDF
+              </label>
+              <div class="smallNote" data-info="caution" style="margin:0;">Each division&rsquo;s prefix is on its own card, and follows the division&rsquo;s name unless you type over it. Turning this off risks two divisions printing identical test names in the same round.</div>
+            </div>
+            <!-- TBD was explained on every card, in the picker, in the list note and in
+                 the tooltip on every option — five copies of one sentence for a thing
+                 you only have to understand once. One switch, one explanation. -->
+            <div class="row topicPrefixBar">
+              <label class="row" style="gap:8px; color:var(--text); font-weight:700;">
+                <input type="checkbox" id="topicTbdEnabled" checked>
+                Offer a TBD Option
+              </label>
+              <div class="smallNote" style="margin:0;">Each division gains a TBD choice that prints the prefix alone, leaving the test name and its code to be written on the sheet by hand afterwards.</div>
+            </div>
+
+          </div>
+        </div>
+      </details>
+
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <form onsubmit="return false;">
+
+      <div id="storageNotice" class="importReview" hidden role="alert"><strong>Another tab saved a newer workspace.</strong><p>Your local edits are still here. Download a backup before choosing which version to keep.</p><button type="button" data-action="exportWorkspace">Download This Tab</button> <button type="button" data-action="loadLatestWorkspace">Load Latest</button> <button type="button" data-action="keepThisWorkspace">Save This Tab Instead</button></div>
+      <div class="alert" id="alertPdf">
+        <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.6 15 14H1z"/><path d="M8 6.6v3M8 11.6h.01"/></svg>
+        <div class="alertBody" id="error1"></div>
+      </div>
+
+      <div class="panel" id="studentsPanel">
+        <div class="listBar">
+          <div class="row listBarLeft" style="gap:10px;">
+            <h3 id="listTitle" style="font-size:15px;">Student List</h3>
+            <div class="seg" id="viewSeg" role="group" aria-label="How to show the student list">
+              <button type="button" data-action="setListView" data-listview="table" data-on="1" title="One table, in printing order">Table</button>
+              <button type="button" data-action="setListView" data-listview="summary" data-on="0" title="Counts by division">Summary</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- the chip for this note belongs beside the heading it explains, not out in
+             the search corner where it was competing with the result count -->
+        <!-- One chip, beside the heading — but the note behind it is a third of what
+             it was, and every part of it is now headed by the column it is about.
+             Chips in the heading row itself were tried and taken out again: the
+             columns that most need explaining are the narrowest ones, so the chip
+             either crowded the label or wrapped under it, and a heading cell is the
+             worst place in the layout to hang anything off. -->
+        <div class="smallNote" id="listNote" data-tip-anchor="listTitle"></div>
+
+        <div class="emptyState" id="studentsEmpty" hidden>
+          <svg class="glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 4.5h16v15H4z"/><path d="M8 9h8M8 12.5h8M8 16h5"/></svg>
+          <div class="emptyTitle">No Students Yet</div>
+          <div class="emptyBody">
+            Paste your enrollment list to load everyone at once, or add a single student by hand.
+            This list is preserved locally in your browser.
+          </div>
+          <div class="row" style="justify-content:center;">
+            <button type="button" class="primary" data-action="jumpToPasteRoster">Paste a Roster</button>
+            <button type="button" data-action="jumpToAddStudent">Add One Student</button>
+          </div>
+        </div>
+
+
+        <div id="studentsRoot" data-view="table">
+          <!-- Summary -->
+          <div id="studentsByDiv">
+            <!-- Same as the table's toolbar below: no inset of its own, so the counts
+                 row reaches the same edges as the division cards under it. -->
+            <div class="panel">
+              <div class="row" style="justify-content:space-between;">
+                <div class="row" style="gap:8px;">
+                  <span class="badge badgeStrong" id="summaryCounts">0/0 added</span>
+                  <div class="smallNote" style="margin:0;">
+                    Executive-level summary of the counts in each division, after filtering to only those added to
+                    the PDF. Expand to read team or topic test distributions.
+                  </div>
+                </div>
+                <!-- The same three-part treatment the table's toolbar wears: glyph,
+                     label, and the label dropped when the bar runs short. Fill Teams is
+                     here because seating is a Summary job as much as a table one — the
+                     cards below are where you read whether a division is seated, and
+                     until now the only way to act on that was to leave for the table. -->
+                <div class="row summaryTools">
+                  <button type="button" class="mini miniIcon" data-action="expandAllRolls" aria-label="Expand All" title="Open every division&rsquo;s roll">
+                    <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 6.2 8 3.2l3 3"/><path d="M5 9.8 8 12.8l3-3"/></svg><span class="miniLabel">Expand All</span>
+                  </button>
+                  <button type="button" class="mini miniIcon" data-action="collapseAllRolls" aria-label="Collapse All" title="Close every division&rsquo;s roll">
+                    <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M5 3.4 8 6.4l3-3"/><path d="M5 12.6 8 9.6l3 3"/></svg><span class="miniLabel">Collapse All</span>
+                  </button>
+                  <button type="button" class="mini miniIcon" data-action="openFillTeams" aria-label="Fill Teams" title="Fill teams"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6" cy="6.2" r="2.1"/><path d="M2.4 12.6c0-2 1.6-3.3 3.6-3.3s3.6 1.3 3.6 3.3"/><circle cx="11.6" cy="6.6" r="1.6"/><path d="M10.8 9.5c1.9.1 2.8 1.3 2.8 3.1"/></svg><span class="miniLabel">Fill Teams</span></button>
+                </div>
+              </div>
+            </div>
+            <div class="listScroll" id="divScroll">
+            <div class="panel" data-divpanel="1" data-divcolor="1" data-rollopen="1">
+              <div class="divHeader">
+                <div class="divHeaderLeft">
+                  <h4 class="divTitle" data-action="toggleDivRoll" data-div="1" data-divtitle="1" data-divcolor="1" data-divpill="1" title="Open or close this division’s roll">Algebra I</h4>
+                  <span class="badge" data-counter="1" id="divCounters1">0/0 added</span>
+                </div>
+                <div class="row">
+                  <button type="button" class="mini miniIcon" data-action="fixTeams" data-div="1" aria-label="Fill Teams" title="Fill this division's teams"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6" cy="6.2" r="2.1"/><path d="M2.4 12.6c0-2 1.6-3.3 3.6-3.3s3.6 1.3 3.6 3.3"/><circle cx="11.6" cy="6.6" r="1.6"/><path d="M10.8 9.5c1.9.1 2.8 1.3 2.8 3.1"/></svg></button>
+                  <button type="button" class="divToggle" data-action="toggleDivRoll" data-div="1" aria-expanded="true" aria-label="Close this division"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 6.5 8 10.5 12 6.5"/></svg></button>
+                </div>
+              </div>
+              <pre class="divSummary" id="divSummary1"></pre>
+            </div>
+            <div class="panel" data-divpanel="2" data-divcolor="2" data-rollopen="1">
+              <div class="divHeader">
+                <div class="divHeaderLeft">
+                  <h4 class="divTitle" data-action="toggleDivRoll" data-div="2" data-divtitle="2" data-divcolor="2" data-divpill="2" title="Open or close this division’s roll">Geometry</h4>
+                  <span class="badge" data-counter="1" id="divCounters2">0/0 added</span>
+                </div>
+                <div class="row">
+                  <button type="button" class="mini miniIcon" data-action="fixTeams" data-div="2" aria-label="Fill Teams" title="Fill this division's teams"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6" cy="6.2" r="2.1"/><path d="M2.4 12.6c0-2 1.6-3.3 3.6-3.3s3.6 1.3 3.6 3.3"/><circle cx="11.6" cy="6.6" r="1.6"/><path d="M10.8 9.5c1.9.1 2.8 1.3 2.8 3.1"/></svg></button>
+                  <button type="button" class="divToggle" data-action="toggleDivRoll" data-div="2" aria-expanded="true" aria-label="Close this division"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 6.5 8 10.5 12 6.5"/></svg></button>
+                </div>
+              </div>
+              <pre class="divSummary" id="divSummary2"></pre>
+            </div>
+            <div class="panel" data-divpanel="3" data-divcolor="3" data-rollopen="1">
+              <div class="divHeader">
+                <div class="divHeaderLeft">
+                  <h4 class="divTitle" data-action="toggleDivRoll" data-div="3" data-divtitle="3" data-divcolor="3" data-divpill="3" title="Open or close this division’s roll">Algebra II</h4>
+                  <span class="badge" data-counter="1" id="divCounters3">0/0 added</span>
+                </div>
+                <div class="row">
+                  <button type="button" class="mini miniIcon" data-action="fixTeams" data-div="3" aria-label="Fill Teams" title="Fill this division's teams"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6" cy="6.2" r="2.1"/><path d="M2.4 12.6c0-2 1.6-3.3 3.6-3.3s3.6 1.3 3.6 3.3"/><circle cx="11.6" cy="6.6" r="1.6"/><path d="M10.8 9.5c1.9.1 2.8 1.3 2.8 3.1"/></svg></button>
+                  <button type="button" class="divToggle" data-action="toggleDivRoll" data-div="3" aria-expanded="true" aria-label="Close this division"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 6.5 8 10.5 12 6.5"/></svg></button>
+                </div>
+              </div>
+              <pre class="divSummary" id="divSummary3"></pre>
+            </div>
+            <div class="panel" data-divpanel="4" data-divcolor="4" data-rollopen="1">
+              <div class="divHeader">
+                <div class="divHeaderLeft">
+                  <h4 class="divTitle" data-action="toggleDivRoll" data-div="4" data-divtitle="4" data-divcolor="4" data-divpill="4" title="Open or close this division’s roll">Precalculus</h4>
+                  <span class="badge" data-counter="1" id="divCounters4">0/0 added</span>
+                </div>
+                <div class="row">
+                  <button type="button" class="mini miniIcon" data-action="fixTeams" data-div="4" aria-label="Fill Teams" title="Fill this division's teams"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6" cy="6.2" r="2.1"/><path d="M2.4 12.6c0-2 1.6-3.3 3.6-3.3s3.6 1.3 3.6 3.3"/><circle cx="11.6" cy="6.6" r="1.6"/><path d="M10.8 9.5c1.9.1 2.8 1.3 2.8 3.1"/></svg></button>
+                  <button type="button" class="divToggle" data-action="toggleDivRoll" data-div="4" aria-expanded="true" aria-label="Close this division"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 6.5 8 10.5 12 6.5"/></svg></button>
+                </div>
+              </div>
+              <pre class="divSummary" id="divSummary4"></pre>
+            </div>
+            <div class="panel" data-divpanel="5" data-divcolor="5" data-rollopen="1">
+              <div class="divHeader">
+                <div class="divHeaderLeft">
+                  <h4 class="divTitle" data-action="toggleDivRoll" data-div="5" data-divtitle="5" data-divcolor="5" data-divpill="5" title="Open or close this division’s roll">Calculus</h4>
+                  <span class="badge" data-counter="1" id="divCounters5">0/0 added</span>
+                </div>
+                <div class="row">
+                  <button type="button" class="mini miniIcon" data-action="fixTeams" data-div="5" aria-label="Fill Teams" title="Fill this division's teams"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6" cy="6.2" r="2.1"/><path d="M2.4 12.6c0-2 1.6-3.3 3.6-3.3s3.6 1.3 3.6 3.3"/><circle cx="11.6" cy="6.6" r="1.6"/><path d="M10.8 9.5c1.9.1 2.8 1.3 2.8 3.1"/></svg></button>
+                  <button type="button" class="divToggle" data-action="toggleDivRoll" data-div="5" aria-expanded="true" aria-label="Close this division"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 6.5 8 10.5 12 6.5"/></svg></button>
+                </div>
+              </div>
+              <pre class="divSummary" id="divSummary5"></pre>
+            </div>
+            <div class="panel" data-divpanel="6" data-divcolor="6" data-rollopen="1">
+              <div class="divHeader">
+                <div class="divHeaderLeft">
+                  <h4 class="divTitle" data-action="toggleDivRoll" data-div="6" data-divtitle="6" data-divcolor="6" data-divpill="6" title="Open or close this division’s roll">Statistics</h4>
+                  <span class="badge" data-counter="1" id="divCounters6">0/0 added</span>
+                </div>
+                <div class="row">
+                  <button type="button" class="mini miniIcon" data-action="fixTeams" data-div="6" aria-label="Fill Teams" title="Fill this division's teams"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6" cy="6.2" r="2.1"/><path d="M2.4 12.6c0-2 1.6-3.3 3.6-3.3s3.6 1.3 3.6 3.3"/><circle cx="11.6" cy="6.6" r="1.6"/><path d="M10.8 9.5c1.9.1 2.8 1.3 2.8 3.1"/></svg></button>
+                  <button type="button" class="divToggle" data-action="toggleDivRoll" data-div="6" aria-expanded="true" aria-label="Close this division"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 6.5 8 10.5 12 6.5"/></svg></button>
+                </div>
+              </div>
+              <pre class="divSummary" id="divSummary6"></pre>
+            </div>
+            <div class="panel" data-divpanel="0" data-divcolor="0" data-rollopen="1">
+              <div class="divHeader">
+                <div class="divHeaderLeft">
+                  <h4 class="divTitle" data-action="toggleDivRoll" data-div="0" data-divtitle="0" data-divcolor="0" data-divpill="0" title="Open or close this division’s roll">Unassigned or Invalid ID</h4>
+                  <span class="badge" data-counter="1" id="divCounters0">0/0 added</span>
+                </div>
+                <div class="row">
+                  <button type="button" class="divToggle" data-action="toggleDivRoll" data-div="0" aria-expanded="true" aria-label="Close this division"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 6.5 8 10.5 12 6.5"/></svg></button>
+                </div>
+              </div>
+              <pre class="divSummary" id="divSummary0"></pre>
+            </div>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div id="studentsTable">
+            <!-- No padding of its own. The panel around it already sets one inset for
+                 everything in the list, and a second one here made the toolbar 12px
+                 narrower than the table frame under it — two boxes that read as a pair
+                 lining up with nothing. Stripped, both reach the same edges and both
+                 sit the panel's own inset in from them. -->
+            <div class="panel listToolsPanel">
+              <!-- Search sits with the two buttons that do its kind of work — narrowing what
+                   the table shows — rather than up in the panel's heading row. It belongs to
+                   the table and lives inside it: the summary counts every student whatever is
+                   typed here, so a box that only ever hid rows was inert up there half the time.
+
+                   No totals badge either. The action bar at the foot of the page carries the
+                   added count at all times, and the table below is the roster it would be
+                   counting — the summary is where the number earns its place, beside the
+                   per-division ones it adds up to. -->
+              <div class="listTools">
+                <div class="listSearchWrap" id="listSearchWrap">
+                  <!-- Deliberately not a list of what it matches: it reads names, IDs and
+                       topic tests, which is too much for a placeholder and goes stale as soon
+                       as another field joins. The empty state spells it out when a search
+                       finds nothing, which is when anyone actually wants to know. -->
+                  <input type="text" id="stuSearch" class="searchInput" placeholder="Search&hellip;" aria-label="Search the student list" autocomplete="off" spellcheck="false">
+                  <span class="badge" id="searchCount" style="display:none;"></span>
+                </div>
+                <!-- Icons alone only while the room is short. Each carries its own
+                     label, shown by the container query below once the bar is wide
+                     enough that the search still has a field's worth of room left —
+                     which is most of the time, and an icon nobody has to hover is
+                     worth more than the 90px it costs. -->
+                <div class="row listToolsBtns">
+                  <button type="button" class="mini miniIcon" id="btnFilter" data-action="openRowFilter" data-on="0" aria-label="Filter rows" title="Filter rows">
+                    <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.2 3.4h11.6L9.3 8.6v4.2l-2.6 1.3V8.6z"/></svg>
+                    <span class="miniLabel">Filter</span>
+                    <span id="filterCount"></span>
+                  </button>
+                  <button type="button" class="mini miniIcon" data-action="openFillTeams" aria-label="Fill Teams" title="Fill teams"><svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6" cy="6.2" r="2.1"/><path d="M2.4 12.6c0-2 1.6-3.3 3.6-3.3s3.6 1.3 3.6 3.3"/><circle cx="11.6" cy="6.6" r="1.6"/><path d="M10.8 9.5c1.9.1 2.8 1.3 2.8 3.1"/></svg><span class="miniLabel">Fill Teams</span></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="filterStrip" id="filterStrip" hidden>
+              <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2.2 3.4h11.6L9.3 8.6v4.2l-2.6 1.3V8.6z"/></svg>
+              <span id="filterStripText"></span>
+              <button type="button" class="mini" data-action="clearRowFilter">Clear Filters</button>
+            </div>
+
+        <div class="emptyState" id="searchEmpty" hidden>
+          <svg class="glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4 21 21"/></svg>
+          <div class="emptyTitle">No Student Matches <span id="searchEmptyTerm"></span></div>
+          <div class="emptyBody">Search looks at first and last names, the FAMAT ID, and the topic test once topic tests are on.</div>
+          <div class="row" style="justify-content:center;">
+            <button type="button" data-action="clearSearch">Clear Search</button>
+            <button type="button" data-action="clearRowFilter">Clear Filters</button>
+          </div>
+        </div>
+            <div class="panel tableScroll">
+              <!-- Flush, not inset. This box is the frame; the table fills it corner to
+                   corner and the cells keep their own padding, so the ruling meets the
+                   border instead of floating 12px inside it. The old inset also had to
+                   be a padding on the frame rather than on the scroller — overflow
+                   clips at the padding box, so rows scrolling through it would have
+                   shown above the pinned column headings. With no inset there is no
+                   band for them to appear in either way. -->
+              <div class="tableViewport" data-sidescroll="mask" data-vscroll="mask">
+              <table>
+                <colgroup>
+                  <col class="stuColGrip" />
+                  <col class="stuColSel" />
+                  <col class="stuColDiv" />
+                  <col class="stuColFirst" />
+                  <col class="stuColLast" />
+                  <col class="stuColTopic" />
+                  <col class="stuColId" />
+                  <col class="stuColTeam" />
+                  <col class="stuColInc" />
+                  <col class="stuColAct" />
+                </colgroup>
+                <tbody id="tbodyAll">
+                  <tr>
+                    <th class="gripCol center" aria-label="Drag to reorder"></th>
+                    <th class="selCol center" aria-label="Select rows"></th>
+                    <th scope="col" class="divCol sortTh" data-action="sortCol" data-sort="division" data-dir="" aria-sort="none" title="Sort by division"><button type="button" class="sortLabel">Division<span class="sortArrows" aria-hidden="true"><svg class="sortUp" viewBox="0 0 10 6"><path d="M1 5 5 1 9 5"/></svg><svg class="sortDown" viewBox="0 0 10 6"><path d="M1 1 5 5 9 1"/></svg></span></button></th>
+                    <th class="nameCol firstCol sortTh" data-action="sortCol" data-sort="first" data-dir="" aria-sort="none" title="Sort by first name, A to Z"><button type="button" class="sortLabel">First<span class="sortArrows" aria-hidden="true"><svg class="sortUp" viewBox="0 0 10 6"><path d="M1 5 5 1 9 5"/></svg><svg class="sortDown" viewBox="0 0 10 6"><path d="M1 1 5 5 9 1"/></svg></span></button></th>
+                    <th class="nameCol lastCol sortTh" data-action="sortCol" data-sort="last" data-dir="" aria-sort="none" title="Sort by last name, A to Z"><button type="button" class="sortLabel">Last<span class="sortArrows" aria-hidden="true"><svg class="sortUp" viewBox="0 0 10 6"><path d="M1 5 5 1 9 5"/></svg><svg class="sortDown" viewBox="0 0 10 6"><path d="M1 1 5 5 9 1"/></svg></span></button></th>
+                    <th class="topicCol sortTh" data-action="sortCol" data-sort="topic" data-dir="" aria-sort="none" title="Sort by topic test"><button type="button" class="sortLabel">Test<span class="sortArrows" aria-hidden="true"><svg class="sortUp" viewBox="0 0 10 6"><path d="M1 5 5 1 9 5"/></svg><svg class="sortDown" viewBox="0 0 10 6"><path d="M1 1 5 5 9 1"/></svg></span></button></th>
+                    <th class="idCol">FAMAT ID</th>
+                    <th class="center teamCol">Team</th>
+                    <th class="center incCol">Added</th>
+                    <th class="center actCol">Actions</th>
+                  </tr>
+                </tbody>
+              </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Team popover (single instance, reused for row and batch) -->
+  <!-- The numbers on offer follow the competition: three teams per division at a
+       regional meet, one statewide. Built in JS from teamNumbers() rather than listed
+       here, so the picker and the fill can never disagree about how many there are. -->
+  <div class="popover" id="teamPopover" role="dialog" aria-label="Team picker">
+    <div class="popoverTitle" id="teamPopoverTitle">Set Team</div>
+    <div class="pRow" id="teamPopoverBody"></div>
+  </div>
+
+  <div class="popover" id="divisionPopover" role="dialog" aria-label="Division picker">
+    <div class="popoverTitle" id="divisionPopoverTitle">Change Level</div>
+    <div class="pRow pCol" id="divisionPopoverBody"></div>
+    <div class="popoverNote">The Roster Level is the last digit of the FAMAT ID, so this rewrites that digit.</div>
+  </div>
+
+  <div class="popover" id="topicPopover" role="dialog" aria-label="Topic test picker">
+    <div id="topicPopoverTitle" class="popoverTitle">Set Topic Test</div>
+    <div class="pRow" id="topicPopoverBody"></div>
+  </div>
+
+  <!-- Nothing is ever shown here. It is the bench syncDivColumnWidth measures the
+       division pills on, off-screen and uncapped, so the column can be sized to the
+       longest name this competition actually uses. -->
+  <div id="divWidthProbe" aria-hidden="true"></div>
+
+  <!-- Fill Teams -->
+  <div class="modalBack" id="fillTeamsModalBack">
+    <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+      <div class="modalTop">
+        <div class="modalTitle">Fill Teams</div>
+        <button type="button" class="primary mini" data-action="closeFillTeams">Done</button>
+      </div>
+      <div class="modalScroll" data-sidescroll="mask" data-vscroll="mask">
+      <!-- The rules are stated once, up here, and each division below says only what
+           is true of it. The old dialog put a full sentence on every button — six
+           copies of "in list order" for one fact about the fill. -->
+      <p class="smallNote" style="margin-top:0;">
+        Seats each division&rsquo;s <strong>added</strong> students into teams, straight
+        <strong>down the list</strong>, so sort or drag the rows first if the order matters.
+        Only the Team column changes. <span id="fillTeamsSeats"></span>
+      </p>
+
+      <!-- What to do about teams somebody has already entered. This used to be settled
+           for you: the fill kept what fitted, always, which is right when you are
+           finishing a job by hand and wrong when you have re-sorted the list and want
+           the seating to follow it. Both are one press now. -->
+      <div class="fillModeRow">
+        <div class="seg" id="fillModeSeg" role="group" aria-label="What to do with teams already entered">
+          <button type="button" data-action="setFillMode" data-mode="keep" data-on="1">Add to Existing</button>
+          <button type="button" data-action="setFillMode" data-mode="redo" data-on="0">Redo from Scratch</button>
+        </div>
+        <span class="smallNote" id="fillModeNote" style="margin:0;"></span>
+      </div>
+
+      <div class="fillList" id="fillTeamsDivs"></div>
+      <div class="fillAllRow">
+        <button type="button" class="primary" id="btnFillTeamsAll" data-action="fixTeamsAll">Fill Every Division</button>
+        <span class="smallNote" id="fillTeamsAllNote" style="margin:0;"></span>
+      </div>
+          </div>
+</div>
+  </div>
+
+  <!-- Duplicates modal -->
+  <div class="modalBack" id="dupModalBack">
+    <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+      <div class="modalTop">
+        <div class="modalTitle">
+          <span class="badge badgeDanger">Duplicate IDs</span>
+          <span class="badge" id="dupModalCount"></span>
+        </div>
+        <button type="button" class="primary mini" data-action="closeDup">Done</button>
+      </div>
+      <div class="modalScroll" data-sidescroll="mask" data-vscroll="mask">
+      <p class="smallNote" style="margin-top:0;">
+        Two added students sharing a Student Number would print the same bubbled ID, so the PDF is
+        blocked until it is resolved. Un-add all but the first, or correct the numbers.
+      </p>
+      <div class="modalList" id="dupList"></div>
+          </div>
+</div>
+  </div>
+
+  <!-- Says what an irreversible-looking action actually did, and offers the way
+       back inline. Sits above the action bar, out of the list's way, and is the one
+       place the undo policy is visible rather than described. -->
+  <div class="toast" id="toast" data-show="0" role="status" aria-live="polite">
+    <span class="toastText"></span>
+    <button type="button" class="toastAction" data-action="undo" hidden>Undo</button>
+  </div>
+
+  <!-- Sticky footer -->
+  <div class="sticky" id="stickyBar">
+    <div class="stickyInner">
+      <div class="stickyLeft" id="stickyLeft">
+        <button type="button" class="mini" id="btnUndo" data-action="undo" disabled title="Nothing to undo">Undo</button>
+        <button type="button" class="mini" id="btnRedo" data-action="redo" disabled title="Nothing to redo">Redo</button>
+
+        <!-- Two pills, one per severity, each saying how many.
+             They wear the list toolbar's icon-and-label chrome, because they do the
+             same job it does: a glyph you learn once, a word while there is room for
+             one, and a number that is the point. Below the width for the words they
+             fall back to the glyph and the count, which is what the Filter button
+             beside the table already does.
+
+             Press one and it lists what it is counting, with a way to reach each. The
+             count is deliberately not the wording — "3 errors" says the same thing
+             whichever three they are, so fixing one reads as a number going down
+             rather than as a different fault appearing. -->
+        <button type="button" class="mini miniIcon sevPill" id="btnErrors" data-sev="fatal"
+                data-action="openIssues" style="display:none;" aria-haspopup="dialog">
+          <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 2.6 15 14H1z"/><path d="M8 6.6v3M8 11.6h.01"/></svg>
+          <span class="miniLabel" id="btnErrorsLabel">Errors</span>
+          <span class="sevCount" id="btnErrorsCount">0</span>
+        </button>
+        <button type="button" class="mini miniIcon sevPill" id="btnWarnings" data-sev="warn"
+                data-action="openIssues" style="display:none;" aria-haspopup="dialog">
+          <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="5.8"/><path d="M8 5.2v3.4M8 10.9h.01"/></svg>
+          <span class="miniLabel" id="btnWarningsLabel">Warnings</span>
+          <span class="sevCount" id="btnWarningsCount">0</span>
+        </button>
+
+        <div class="progressWrap" id="progressWrap" style="display:none;">
+          <span class="badge" id="progressText">Generating 0/0</span>
+          <div class="progressBar"><div class="progressFill" id="progressFill"></div></div>
+          <button type="button" class="mini" data-action="cancelPDF">Cancel</button>
+        </div>
+      </div>
+
+      <div class="stickyRight" id="stickyRight">
+        <span class="badge badgeStrong" id="stickyStats">0 added</span>
+        <button type="button" class="primary" id="btnCreateSticky" data-action="createPDF">Create PDF</button>
+      </div>
+    </div>
+    <div class="stickySelectionOverlay" id="stickySelectionOverlay">
+      <div class="stickySelectionInner">
+        <span class="badge badgeWarn" id="selectionBadge" style="display:none;">0 selected</span>
+        <div class="selBar" id="stickyBatchMenus" data-sidescroll="mask" style="display:none;">
+          <span class="selGroup">
+            <button type="button" class="selBtn" data-action="selectAllVisible" title="Select all shown">
+              <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 3h10v10H3z"/><path d="M5.6 8.2 7.2 9.8 10.6 6"/></svg>All
+            </button>
+            <button type="button" class="selBtn" data-action="selectIncluded" title="Select every student already added to the PDF">
+              <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4 2.6h8v10.8H4z"/><path d="M6 8.2 7.4 9.6 10.2 6.4"/></svg>Added
+            </button>
+          </span>
+
+          <span class="selDivide" aria-hidden="true"></span>
+
+          <span class="selGroup">
+            <button type="button" class="selBtn isGood" data-action="batchInclude" title="Add the selected students to the PDF (A)">
+              <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.2 8.4 6.4 11.6 12.8 4.8"/></svg>Add
+            </button>
+            <button type="button" class="selBtn" data-action="batchExclude" title="Take the selected students out of the PDF (X)">
+              <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M4.4 4.4l7.2 7.2M11.6 4.4l-7.2 7.2"/></svg>Remove
+            </button>
+          </span>
+
+          <span class="selDivide" aria-hidden="true"></span>
+
+          <span class="selGroup">
+            <button type="button" class="selBtn" id="btnBatchDivision" data-action="openBatchDivision" title="Change level">
+              <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 5.5h8.5M9 3l2.5 2.5L9 8"/><path d="M13 10.5H4.5M7 8l-2.5 2.5L7 13"/></svg>Division
+            </button>
+            <button type="button" class="selBtn" id="btnBatchTeam" data-action="openBatchTeam" title="Seat the selected students on a team">
+              <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="6" cy="6.2" r="2.1"/><path d="M2.4 12.6c0-2 1.6-3.3 3.6-3.3s3.6 1.3 3.6 3.3"/><circle cx="11.6" cy="6.6" r="1.6"/><path d="M10.8 9.5c1.9.1 2.8 1.3 2.8 3.1"/></svg>Team
+            </button>
+            <button type="button" class="selBtn" id="btnBatchTopic" data-action="openBatchTopic" title="Give the selected students a topic test">
+              <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.4 2.8h9.2v10.4H3.4z"/><path d="M5.8 6h4.4M5.8 8.4h4.4M5.8 10.8h2.6"/></svg>Topic
+            </button>
+          </span>
+
+          <span class="selDivide" aria-hidden="true"></span>
+
+          <button type="button" class="selBtn isDanger" data-action="batchDelete" title="Delete selected">
+            <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3.5 4.5h9"/><path d="M6.5 4.5V3h3v1.5"/><path d="M4.8 4.5 5.4 13h5.2l.6-8.5"/><path d="M6.8 6.8v3.8M9.2 6.8v3.8"/></svg>Delete
+          </button>
+
+        </div>
+        <!-- Pinned, beside the count, rather than riding the scroller with the actions.
+             It is the way out of the selection, not one of the things you can do to it,
+             and on a narrow bar it was the first button to scroll off — the one control
+             here you should never have to go looking for.
+             Its own glyph too: it wore the bare X that Remove wears, so the bar had two
+             different X buttons and the destructive one was the one that looked like a
+             dismissal. A ringed X reads as "close this", which is what it does. -->
+        <button type="button" class="selBtn selCancel" data-action="clearSelection" title="Clear the selection and close this bar (Esc)">
+          <svg class="glyph" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="5.7"/><path d="M6.1 6.1l3.8 3.8M9.9 6.1l-3.8 3.8"/></svg>Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row filter -->
+  <div class="modalBack" id="filterModalBack">
+    <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+      <div class="modalTop">
+        <div class="modalTitle">Filter the List</div>
+        <div class="row">
+          <button type="button" class="mini" data-action="clearRowFilter">Clear All</button>
+          <button type="button" class="primary mini" data-action="closeRowFilter">Done</button>
+        </div>
+      </div>
+      <div class="modalScroll" data-sidescroll="mask" data-vscroll="mask">
+      <p class="smallNote" style="margin-top:0;">
+        Temporarily narrows what the table displays, similar to a Google Sheets filter. A column that
+        has everything ticked does not have an active filter. <strong>This is only a lens on the
+        student list, not the PDF.</strong> Filters can potentially hide students added to the PDF, so
+        confirm the full PDF list by disabling all filters before generating the PDF.
+      </p>
+      <div id="filterBody"></div>
+          </div>
+</div>
+  </div>
+
+  <!-- Competition -->
+  <div class="modalBack" id="competitionModalBack">
+    <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+      <div class="modalTop">
+        <div class="modalTitle">Competition</div>
+        <button type="button" class="primary mini" data-action="closeCompetition">Done</button>
+      </div>
+      <div class="modalScroll" data-sidescroll="mask" data-vscroll="mask">
+      <p class="smallNote" style="margin-top:0;">
+        Choose a format below. Changes apply immediately and can be undone. Stored FAMAT IDs stay the same.
+      </p>
+      <div id="competitionBody"></div>
+
+      <details class="compNames compExplain" id="compNames">
+        <summary>Printed Test Names and Codes</summary>
+        <div class="compExplainBody">
+        <div class="compHint" id="divisionTestHelp">
+          <strong>Individual Test Fields.</strong> These names and codes print when Topic Tests is off.
+        </div>
+        <!-- Two boxes per division: what prints in the Test field, and the three
+             digits bubbled beside it. Not a <label> any more — a label points at one
+             control and there are two here, so the caption is a caption and each box
+             names itself to a screen reader.
+             The inputs are found by data-divlabel / data-divtestid rather than by
+             position: the code that reads them used to take the first six inputs under
+             #division, which was true right up until there were twelve. -->
+        <p class="smallNote">These fields change printed test text only. Clear a field to use its default. To rename a Custom division, use the division name editor.</p>
+        <div id="division" class="row" style="gap:12px;">
+          <div class="field divTestField" data-divfield="1">
+            <span class="fieldLabel" data-divcaption="1">1</span>
+            <div class="divTestRow">
+              <input type="text" id="divisionLabel1" data-divlabel="1" aria-label="Test name printed for division 1">
+              <input type="text" id="divisionTestId1" data-divtestid="1" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 1" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+            </div>
+          </div>
+          <div class="field divTestField" data-divfield="2">
+            <span class="fieldLabel" data-divcaption="2">2</span>
+            <div class="divTestRow">
+              <input type="text" id="divisionLabel2" data-divlabel="2" aria-label="Test name printed for division 2">
+              <input type="text" id="divisionTestId2" data-divtestid="2" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 2" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+            </div>
+          </div>
+          <div class="field divTestField" data-divfield="3">
+            <span class="fieldLabel" data-divcaption="3">3</span>
+            <div class="divTestRow">
+              <input type="text" id="divisionLabel3" data-divlabel="3" aria-label="Test name printed for division 3">
+              <input type="text" id="divisionTestId3" data-divtestid="3" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 3" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+            </div>
+          </div>
+          <div class="field divTestField" data-divfield="4">
+            <span class="fieldLabel" data-divcaption="4">4</span>
+            <div class="divTestRow">
+              <input type="text" id="divisionLabel4" data-divlabel="4" aria-label="Test name printed for division 4">
+              <input type="text" id="divisionTestId4" data-divtestid="4" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 4" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+            </div>
+          </div>
+          <div class="field divTestField" data-divfield="5">
+            <span class="fieldLabel" data-divcaption="5">5</span>
+            <div class="divTestRow">
+              <input type="text" id="divisionLabel5" data-divlabel="5" aria-label="Test name printed for division 5">
+              <input type="text" id="divisionTestId5" data-divtestid="5" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 5" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+            </div>
+          </div>
+          <div class="field divTestField" data-divfield="6">
+            <span class="fieldLabel" data-divcaption="6">6</span>
+            <div class="divTestRow">
+              <input type="text" id="divisionLabel6" data-divlabel="6" aria-label="Test name printed for division 6">
+              <input type="text" id="divisionTestId6" data-divtestid="6" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 6" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+            </div>
+          </div>
+        </div>
+        </div>
+      </details>
+
+      <details class="compExplain">
+            <summary>What Changes When I Switch?</summary>
+        <div class="compExplainBody">
+          <p>Switching updates divisions, available topic tests and printed division digits using each student&rsquo;s roster level. Your enrollment list and stored FAMAT IDs stay unchanged.</p>
+          <p>Students who change division lose their team assignments, and incompatible topic tests are cleared. Printed test names return to the preset defaults. Use Undo to reverse the whole switch, including any cleared assignments.</p>
+        </div>
+      </details>
+          </div>
+</div>
+  </div>
+
+  <!-- Custom competition editor.
+       Its own dialog, because it is the only place in the app where you build
+       something rather than pick something, and that needs room: a row per roster
+       division saying where it lands, then the divisions themselves — name, bubbled
+       digit, color — with the problems it would cause stated as you make them. -->
+  <div class="modalBack" id="customModalBack">
+    <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+      <div class="modalTop">
+        <div class="modalTitle" id="customEditorTitle">Custom Divisions</div>
+        <div class="row" id="customEditorTools">
+          <button type="button" class="mini" data-action="resetDivColors" data-custom-only="0">Revert to Original Colors</button>
+          <button type="button" class="mini danger" data-action="emptyCustom" data-custom-only="1"
+                  title="Remove every division and set every roster level to Does not compete.">Start Empty</button>
+          <button type="button" class="mini danger" data-action="revertCustom" data-custom-only="1"
+                  title="Put this custom competition back to the regular season it started from.">Revert to Regional</button>
+          <button type="button" class="primary mini" data-action="closeCustomEditor">Done</button>
+        </div>
+      </div>
+      <div class="modalScroll" data-sidescroll="mask" data-vscroll="mask">
+      <p class="smallNote" style="margin-top:0;" id="customEditorLede"></p>
+
+      <div id="customProblems"></div>
+
+      <!-- Each section says once what the number after the arrow is. It used to be
+           spelled out on every row and in every option — "bubbles 4", thirty-odd times
+           in one dialog — for a fact you only have to learn here the first time. -->
+      <div class="customSection" data-custom-only="1">
+        <div class="customSectionHead">
+          <span>Where Each Roster Level Competes</span>
+          <span class="customLegend"><span aria-hidden="true">&rarr;</span> the bubble digit(s) in column 8</span>
+        </div>
+        <div class="customMapGrid" id="customMapGrid"></div>
+      </div>
+
+      <div class="customSection">
+        <div class="customSectionHead">
+          <span id="customDivListHead">The Divisions</span>
+          <span class="customLegend"><span aria-hidden="true">&rarr;</span> the bubble digit(s) in column 8</span>
+          <button type="button" class="mini" data-action="addCustomDivision" data-custom-only="1">Add a Division</button>
+        </div>
+        <div class="customDivList" id="customDivList"></div>
+      </div>
+
+      <div class="customSection" data-custom-only="1">
+        <div class="customSectionHead">Teams per Division</div>
+        <div class="row" style="gap:var(--s3);">
+          <div class="seg" id="customTeamSeg">
+            <button type="button" data-action="setCustomTeams" data-n="0">0</button>
+            <button type="button" data-action="setCustomTeams" data-n="1">1</button>
+            <button type="button" data-action="setCustomTeams" data-n="2">2</button>
+            <button type="button" data-action="setCustomTeams" data-n="3">3</button>
+            <button type="button" data-action="setCustomTeams" data-n="4">4</button>
+            <button type="button" data-action="setCustomTeams" data-n="5">5</button>
+            <button type="button" data-action="setCustomTeams" data-n="6">6</button>
+            <button type="button" data-action="setCustomTeams" data-n="7">7</button>
+            <button type="button" data-action="setCustomTeams" data-n="8">8</button>
+            <button type="button" data-action="setCustomTeams" data-n="9">9</button>
+          </div>
+          <span class="compFootNote" id="customTeamNote"></span>
+        </div>
+      </div>
+
+      <!-- Four to a team is FAMAT's number, not arithmetic, so a competition you
+           invent gets to say otherwise. 1-6 covers what anyone is likely to run and
+           is one press; the box beside it takes anything up to 99 for the cases that
+           are not; Unlimited is the answer for a "team" that is really a squad, and
+           it turns off the over-full warning rather than setting a very large cap. -->
+      <div class="customSection" data-custom-only="1" id="customTeamSizeSection">
+        <div class="customSectionHead">People per Team</div>
+        <div class="row" style="gap:var(--s3);">
+          <div class="seg" id="customTeamSizeSeg">
+            <button type="button" data-action="setCustomTeamSize" data-n="1">1</button>
+            <button type="button" data-action="setCustomTeamSize" data-n="2">2</button>
+            <button type="button" data-action="setCustomTeamSize" data-n="3">3</button>
+            <button type="button" data-action="setCustomTeamSize" data-n="4">4</button>
+            <button type="button" data-action="setCustomTeamSize" data-n="5">5</button>
+            <button type="button" data-action="setCustomTeamSize" data-n="6">6</button>
+            <button type="button" data-action="setCustomTeamSize" data-n="0"
+                    title="No cap: a team may hold any number, and no team is ever reported as over-full.">Unlimited</button>
+          </div>
+          <label class="row" style="gap:6px;">
+            <span class="fieldLabel">Or</span>
+            <input type="text" id="customTeamSizeInput" class="numField" inputmode="numeric" maxlength="2"
+                   placeholder=""
+                   aria-label="People per team" title="Any whole number from 1 to 99.">
+          </label>
+          <span class="compFootNote" id="customTeamSizeNote"></span>
+        </div>
+      </div>
+          </div>
+</div>
+  </div>
+
+  <!-- Keyboard shortcuts -->
+  <div class="modalBack" id="shortcutsModalBack">
+    <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+      <div class="modalTop">
+        <div class="modalTitle">Keyboard Shortcuts</div>
+        <button type="button" class="primary mini" data-action="closeShortcuts">Done</button>
+      </div>
+      <div class="modalScroll" data-sidescroll="mask" data-vscroll="mask">
+      <div class="shortcutGrid">
+        <div class="shortcutGroup">
+          <h4>Anywhere</h4>
+          <div class="shortcutRow"><span>Jump to search</span><span class="keys"><span class="kbd">/</span></span></div>
+          <div class="shortcutRow"><span>Undo</span><span class="keys"><span class="kbd" data-mod></span><span class="kbd">Z</span></span></div>
+          <div class="shortcutRow"><span>Redo</span><span class="keys"><span class="kbd" data-mod></span><span class="kbd">&#8679;</span><span class="kbd">Z</span></span></div>
+          <div class="shortcutRow"><span>Close a menu, popover or dialog</span><span class="keys"><span class="kbd">Esc</span></span></div>
+        </div>
+        <div class="shortcutGroup">
+          <h4>With Rows Selected</h4>
+          <div class="shortcutRow"><span>Add to the PDF</span><span class="keys"><span class="kbd">A</span></span></div>
+          <div class="shortcutRow"><span>Remove from the PDF</span><span class="keys"><span class="kbd">X</span></span></div>
+          <div class="shortcutRow"><span>Set Team</span><span class="keys" id="scBatchTeamKeys"><span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span></span></div>
+          <div class="shortcutRow"><span>Clear the selection</span><span class="keys"><span class="kbd">Esc</span></span></div>
+        </div>
+        <div class="shortcutGroup">
+          <h4>In the Student List</h4>
+          <div class="shortcutRow"><span>Toggle Added on the focused row</span><span class="keys"><span class="kbd">Enter</span><span class="kbd">Space</span></span></div>
+          <div class="shortcutRow"><span>Sort by the focused heading</span><span class="keys"><span class="kbd">Enter</span><span class="kbd">Space</span></span></div>
+          <div class="shortcutRow"><span>Tick or untick one row, leaving the rest as they are</span><span class="keys"><span class="kbd">click</span> its box</span></div>
+          <div class="shortcutRow"><span>Tick every row between this one and the last one clicked</span><span class="keys"><span class="kbd">&#8679;</span><span class="kbd">click</span></span></div>
+          <div class="shortcutRow"><span>Move a row, and the page it prints on</span><span class="keys"><span class="kbd">drag</span> the grip</span></div>
+          <div class="shortcutRow"><span>Open the whole FAMAT ID, not just the Student Number</span><span class="keys"><span class="kbd">double-click</span> it, or <span class="kbd">&#9003;</span> on an empty one</span></div>
+          <div class="shortcutRow"><span>Clear the search box</span><span class="keys"><span class="kbd">Esc</span></span></div>
+        </div>
+        <div class="shortcutGroup">
+          <h4>In a Picker</h4>
+          <div class="shortcutRow"><span>Team picker</span><span class="keys" id="scTeamPickerKeys"><span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span><span class="kbd">X</span></span></div>
+          <div class="shortcutRow"><span>Topic picker: the numbered option</span><span class="keys"><span class="kbd">1</span>&ndash;<span class="kbd">9</span></span></div>
+          <div class="shortcutRow"><span>Topic picker: no topic</span><span class="keys"><span class="kbd">X</span></span></div>
+          <div class="shortcutRow"><span>Division picker</span><span class="keys"><span class="kbd">1</span>&ndash;<span class="kbd">6</span></span></div>
+        </div>
+      </div>
+          </div>
+</div>
+  </div>
+
+  <!-- Settings -->
+  <div class="modalBack" id="settingsModalBack">
+    <div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+      <div class="modalTop">
+        <div class="modalTitle">Settings</div>
+        <button type="button" class="primary mini" data-action="closeSettings">Done</button>
+      </div>
+      <div class="modalScroll" data-sidescroll="mask" data-vscroll="mask">
+      <p class="smallNote" style="margin-top:0;">Saved in this browser and applied immediately. These changes are not included in Undo or Redo.</p>
+
+      <div class="setGroup">
+        <div class="setGroupTitle">Appearance</div>
+        <div class="setList">
+          <div class="setRow">
+            <div><div class="setLabel">Theme</div><div class="setHint">System follows your OS appearance.</div></div>
+            <div class="seg" data-pref-seg="theme">
+              <button type="button" data-val="dark">Dark</button>
+              <button type="button" data-val="light">Light</button>
+              <button type="button" data-val="system">System</button>
+            </div>
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Page Width</div><div class="setHint">How wide the content area may grow.</div></div>
+            <div class="seg" data-pref-seg="width">
+              <button type="button" data-val="standard">Standard</button>
+              <button type="button" data-val="wide">Wide</button>
+              <button type="button" data-val="full">Full</button>
+            </div>
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Accent Color</div><div class="setHint">Buttons, focus rings and selection.</div></div>
+            <input type="color" data-pref-color="accent">
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Division Colors</div><div class="setHint">Now set per competition, beside the divisions they belong to.</div></div>
+            <button type="button" class="mini" data-action="openCompetition">Open Competition</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="setGroup">
+        <div class="setGroupTitle">Student List</div>
+        <div class="setList">
+          <div class="setRow">
+            <div><div class="setLabel">Density</div><div class="setHint">Row height in the student list.</div></div>
+            <div class="seg" data-pref-seg="density">
+              <button type="button" data-val="compact">Compact</button>
+              <button type="button" data-val="cozy">Cozy</button>
+              <button type="button" data-val="comfortable">Roomy</button>
+            </div>
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Row Tint Strength</div><div class="setHint">How strongly added rows take on their division color.</div></div>
+            <div class="seg" data-pref-seg="tintStrength">
+              <button type="button" data-val="soft">Soft</button>
+              <button type="button" data-val="normal">Normal</button>
+              <button type="button" data-val="strong">Strong</button>
+            </div>
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Zebra Striping</div><div class="setHint">Shade every other row to help track across the table.</div></div>
+            <input type="checkbox" data-pref-check="zebra">
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Hide Empty Divisions</div><div class="setHint">Drop a division panel from Summary and Counts while it has no students in it.</div></div>
+            <input type="checkbox" data-pref-check="hideEmptyDivs">
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Sticky Column Headers</div><div class="setHint">Keep the headings, and the arrows that sort by them, visible while scrolling.</div></div>
+            <input type="checkbox" data-pref-check="stickyHead">
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Sticky Page Header</div><div class="setHint">Keep the title, the competition switcher and the setup menus pinned to the top of the page.</div></div>
+            <input type="checkbox" data-pref-check="stickyTop">
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Selection Column</div><div class="setHint">Checkboxes for the batch actions.</div></div>
+            <input type="checkbox" data-pref-check="colSel">
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Team Column</div><div class="setHint">Hide it if you never bubble Team Numbers.</div></div>
+            <input type="checkbox" data-pref-check="colTeam">
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">FAMAT ID Column</div><div class="setHint">Hide it once the IDs are verified.</div></div>
+            <input type="checkbox" data-pref-check="colId">
+          </div>
+          <div class="setRow">
+            <div><div class="setLabel">Row Action Columns</div><div class="setHint">Change level, duplicate and delete, at the end of each row.</div></div>
+            <input type="checkbox" data-pref-check="colAct">
+          </div>
+        </div>
+      </div>
+
+      <div class="setGroup">
+        <div class="setGroupTitle">Help</div>
+        <div class="setList">
+          <div class="setRow">
+            <div><div class="setLabel">Explanatory Text</div><div class="setHint">On hover keeps the guidance one pointer away without spending space.</div></div>
+            <div class="seg" data-pref-seg="help">
+              <button type="button" data-val="hover">On Hover</button>
+              <button type="button" data-val="on">Always</button>
+              <button type="button" data-val="off">Off</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="setFooter resetSettings">
+        <details class="resetDisclosure">
+          <summary>Reset Display Settings&hellip;</summary>
+          <div class="resetDisclosureBody">
+            <ul>
+              <li><strong>Resets:</strong> theme, accent color, row density, tint, columns and help preferences.</li>
+              <li><strong>Keeps:</strong> students, competition setup, undo history, drafts and roster slots.</li>
+            </ul>
+            <button type="button" class="danger" data-action="resetSettings"
+                    title="Restore display settings to their defaults. This cannot be undone.">Confirm</button>
+            <p>Cannot be undone.</p>
+          </div>
+        </details>
+      </div>
+      <div class="setFooter resetWorkspace">
+        <details class="resetDisclosure">
+          <summary>Reset Full Workspace&hellip;</summary>
+          <div class="resetDisclosureBody">
+            <ul>
+              <li><strong>Resets:</strong> students, competition settings, preferences and undo history.</li>
+              <li><strong>Keeps:</strong> saved drafts and roster slots.</li>
+            </ul>
+            <button type="button" class="danger" data-action="resetEverything">Confirm</button>
+            <p>Cannot be undone.</p>
+          </div>
+        </details>
+        <div class="row"><button type="button" data-action="exportWorkspace">Download Backup</button><button type="button" data-action="importWorkspace">Restore Backup</button></div>
+        <label class="smallNote"><input type="checkbox" id="restoreSavedData"> Also replace preferences, draft slots and roster slots from the backup. This replacement cannot be undone.</label>
+        <p class="smallNote">Leave unchecked to restore only the workspace and keep your current saved slots and preferences.</p>
+        <input type="file" id="workspaceFile" accept=".json,application/json" hidden>
+      </div>
+          </div>
+</div>
+  </div>
+
+  <div class="modalBack" id="pdfPreviewBack"><div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+    <div class="modalTop"><div class="modalTitle">Review the PDF Before Downloading</div><button type="button" data-action="closePdfPreview">Close</button></div>
+      <div class="modalScroll" data-sidescroll="mask" data-vscroll="mask">
+    <p id="pdfPreviewWarning" role="alert"></p>
+    <p class="smallNote">Inspect the Name, School and Test boxes. Close this preview to edit, or download this version.</p>
+    <iframe id="pdfPreviewFrame" title="Generated answer sheets preview"></iframe>
+    <div class="row"><button type="button" class="primary" data-action="downloadPreview">Download PDF</button></div>
+        </div>
+</div></div>
+  <div class="modalBack" id="studentDetailsBack"><div class="modal" role="dialog" aria-modal="true" tabindex="-1">
+    <div class="modalTop"><div class="modalTitle">Student Details</div><button type="button" data-action="closeStudentDetails">Done</button></div>
+      <div class="modalScroll" data-sidescroll="mask" data-vscroll="mask">
+    <div id="studentDetailsBody"></div>
+        </div>
+</div></div>
+
+  <!-- Copy rule: no em dashes or semicolons in prose this page shows, here or in the
+       strings js/ builds at runtime. Rewrite the sentence instead of swapping in a
+       lookalike. En dashes, ellipses, and the em dash that marks an empty Team or Test
+       cell are all fine. See CLAUDE.md. -->
+  <!-- The app is one classic script split across files: they share a single global
+       scope and run top to bottom, so the numbering IS the load order. A function
+       declared in a later file is not available to code that RUNS at the top level
+       of an earlier one (that used to work when this was all one <script>, because
+       hoisting covered the whole file). Declarations and addEventListener calls are
+       fine anywhere; eager calls are not. Keep the order, and keep any new helper
+       that runs early in 01-utils.js. -->
+  <script src="js/01-utils.js"></script>
+  <script src="js/02-config.js"></script>
+  <script src="js/03-competitions.js"></script>
+  <script src="js/04-competition-editor.js"></script>
+  <script src="js/05-topic-tests.js"></script>
+  <script src="js/06-state.js"></script>
+  <script src="js/07-print-fields.js"></script>
+  <script src="js/08-sorting.js"></script>
+  <script src="js/09-list-display.js"></script>
+  <script src="js/10-famat-id.js"></script>
+  <script src="js/11-render.js"></script>
+  <script src="js/12-summaries-duplicates.js"></script>
+  <script src="js/13-warnings.js"></script>
+  <script src="js/14-problems.js"></script>
+  <script src="js/15-undo-redo.js"></script>
+  <script src="js/16-toast.js"></script>
+  <script src="js/17-mutations.js"></script>
+  <script src="js/18-selection.js"></script>
+  <script src="js/19-fill-teams.js"></script>
+  <script src="js/20-storage-slots.js"></script>
+  <script src="js/21-test-names.js"></script>
+  <script src="js/22-filtering.js"></script>
+  <script src="js/23-team-popover.js"></script>
+  <script src="js/24-division-change.js"></script>
+  <script src="js/25-shortcuts.js"></script>
+  <script src="js/26-event-delegation.js"></script>
+  <script src="js/27-row-drag.js"></script>
+  <script src="js/28-top-level-buttons.js"></script>
+  <script src="js/29-pdf-overlay.js"></script>
+  <script src="js/30-init-and-preferences.js"></script>
+  <script src="js/31-template.js"></script>
+  <script src="js/32-interactions.js"></script>
+
+</body>
+</html>

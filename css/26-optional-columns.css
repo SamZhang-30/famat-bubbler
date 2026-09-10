@@ -1,0 +1,60 @@
+    /* ============================================================
+       Optional columns
+       ============================================================ */
+
+    html[data-col-sel="0"] .selCol,
+    html[data-col-sel="0"] col.stuColSel{ display: none; }
+    html[data-col-team="0"] .teamCol,
+    html[data-col-team="0"] col.stuColTeam{ display: none; }
+    html[data-col-id="0"] .idCol,
+    html[data-col-id="0"] col.stuColId{ display: none; }
+    html[data-col-act="0"] .actCol,
+    html[data-col-act="0"] col.stuColAct{ display: none; }
+
+    /* A column that is off is not in the table, so it is not in the table's floor
+       either: its token goes to zero and --wFixed comes down by that much. Left in,
+       the floor would hold room for a column nobody can see and hand it to the names,
+       which is the one thing the widths above are trying to keep constant. */
+    html[data-col-sel="0"]  #studentsRoot{ --wSel:  0px; }
+    html[data-col-team="0"] #studentsRoot{ --wTeam: 0px; }
+    html[data-col-id="0"]   #studentsRoot{ --wId:   0px; }
+    html[data-col-act="0"]  #studentsRoot{ --wAct:  0px; }
+
+    @media (max-width: 860px){
+      .topSectionBody{ width: min(94vw, 660px); }
+      /* beats the 240px base minimum on input[type="text"]; the grid track sizes it */
+      .searchInput{ width: 100%; min-width: 0 !important; }
+      /* The topic grid used to drop to one column here. It answers to the width of
+         its own container now — see .topicGrid — because this threshold was 200px
+         above the width at which the menu holding it stops growing. */
+
+      /* Below this width the eight fixed columns no longer fit, and a fixed layout
+         answers that by collapsing the two name columns to nothing. Let the table
+         keep its real widths and scroll sideways instead. Scoped to narrow screens
+         on purpose: an overflow container anywhere above the header cells would stop
+         them pinning to the viewport, which is the whole point of sticky headers. */
+      .tableViewport{ overflow-x: auto; }
+      /* The floor is what the columns need, added up: the seven whose size is known,
+         plus the reading the two name fields and the Test chip are held to. It comes
+         out at 827.5px compact, 863.6 cozy and 899.7 comfortable — a wider table at
+         the roomier densities because the type there is bigger, which is the point:
+         the same words, not the same pixels. */
+      #studentsRoot table{ min-width: calc(var(--wFixed) + 2 * var(--wNameMin) + var(--wTestMin)); }
+      /* With no Test column there is one fewer thing to make room for, and the floor
+         drops by exactly that column. What is left is the same two name fields holding
+         the same reading they hold with the Test column present — 674px compact,
+         699.2 cozy, 724.4 comfortable — so a first name shows the same amount of
+         itself whichever way the competition is set up.
+
+         That reading is the one chosen a change ago: 40% off the 135.5px the names
+         used to get at compact, which a name field scrolls its own text past rather
+         than widening the column for. */
+      html.no-topic-tests #studentsRoot table{ min-width: calc(var(--wFixed) + 2 * var(--wNameMin)); }
+      /* The headings used to be unpinned here, back when this width meant the page
+         was the scrollport and .tableViewport scrolled sideways only: pinning against
+         a box that never scrolls vertically just parked them partway down the table.
+         The anchored layout above now owns that box at every width, and it is the
+         vertical scroller, so the headings pin against the right thing and the rule
+         that switched them off is gone. */
+    }
+

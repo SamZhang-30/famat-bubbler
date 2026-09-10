@@ -1,0 +1,202 @@
+    /* ============================================================
+       Custom competition editor
+       ============================================================ */
+
+    .compTableFoot{
+      display: flex;
+      align-items: center;
+      gap: var(--s3);
+      flex-wrap: wrap;
+      margin-top: var(--s3);
+    }
+    .compFootNote{ color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    /* The custom editor opens over the competition dialog that sent you to it, so it
+       sits one step above every other modal. */
+    #customModalBack{
+      z-index: 82;
+    }
+
+
+    .customSection{ margin-top: var(--s5); }
+    /* Two digits' worth, like the Test ID box in the dialog above it. The `!important`
+       is the same one that box needs: `input[type="text"]` sets a 240px floor for
+       fields standing on their own, and this one is a stop on a toolbar. */
+    #customTeamSizeInput{
+      width: 56px;
+      min-width: 0 !important;
+      padding: 0 var(--s2);
+      text-align: center;
+    }
+    /* A section whose setting the one above it has made irrelevant. Dimmed and inert
+       rather than removed, the same rule the disabled toolbar buttons follow: it
+       keeps the dialog's shape, and its own note is what explains why it is quiet.
+       The note stays at full strength — it is the part with something to say. */
+    .customSection[data-off="1"] > .customSectionHead,
+    .customSection[data-off="1"] .seg,
+    .customSection[data-off="1"] .fieldLabel,
+    .customSection[data-off="1"] input{ opacity: 0.45; }
+    .customSectionHead{
+      display: flex;
+      align-items: center;
+      gap: var(--s3);
+      flex-wrap: wrap;
+      margin-bottom: var(--s3);
+      padding-bottom: var(--s2);
+      border-bottom: 1px solid var(--line2);
+      color: var(--text);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .customSectionHead .mini{ margin-left: auto; text-transform: none; letter-spacing: 0; }
+
+    /* one row per roster division: the name it came in under, and where it goes */
+    .customMapGrid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--s2) var(--s4);
+    }
+    .customMapRow{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      min-height: var(--h-sm);
+    }
+    .customMapFrom{
+      flex: 1 1 auto;
+      min-width: 0;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 650;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .customMapRow select{ flex: 0 0 auto; width: 150px; min-height: var(--h-sm); }
+
+    /* one row per division: color, name, digit, and a way to remove it */
+    .customDivList{ display: flex; flex-direction: column; gap: var(--s2); }
+    .customDivRow{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      padding: var(--s2);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--tint);
+      flex-wrap: wrap;
+    }
+    /* same drag affordance as the student list, and the same drop markers */
+    .customDivGrip{ flex: 0 0 auto; height: var(--h-sm); }
+    .customDivRow:hover .customDivGrip{ opacity: 0.85; }
+    .customDivRow.isDragging{ opacity: 0.45; }
+    .customDivRow.dropBefore{ box-shadow: inset 0 2px 0 0 var(--accent); }
+    .customDivRow.dropAfter{ box-shadow: inset 0 -2px 0 0 var(--accent); }
+    .customDivRow[data-bad="1"]{
+      border-color: color-mix(in srgb, var(--danger) 55%, transparent);
+      background: color-mix(in srgb, var(--danger) 10%, transparent);
+    }
+    .customDivName{ flex: 1 1 160px; min-width: 120px; min-height: var(--h-sm); }
+    .customDivDigit{
+      flex: 0 0 auto;
+      width: 74px;
+      min-height: var(--h-sm);
+    }
+    /* Under a preset the name and digit are facts, not fields: they read as text on
+       the row so the swatch is plainly the only thing you can touch. */
+    .customDivFixed{
+      flex: 1 1 160px;
+      min-width: 120px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .customDivFixedDigit{
+      flex: 0 0 auto;
+      width: 74px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    /* What "Bubbles" used to say on every row, as one glyph. The word is in the
+       section heading; this is the pointer from a division to its digit. */
+    .customDivArrow{
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1;
+    }
+    /* The legend that word moved into. Sits at the right-hand end of the heading, and
+       gives the "Add a division" button back its own place there by claiming the
+       margin the button used to take. */
+    .customLegend{
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 650;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .customSectionHead .customLegend + .mini{ margin-left: var(--s3); }
+
+    /* what this competition would do wrong, stated where it is being built */
+    .customProblem{
+      display: flex;
+      align-items: flex-start;
+      gap: var(--s2);
+      margin-bottom: var(--s2);
+      padding: var(--s3);
+      border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent);
+      border-left-width: 3px;
+      border-radius: var(--r-md);
+      background: color-mix(in srgb, var(--danger) 10%, transparent);
+      color: color-mix(in srgb, var(--danger) 88%, var(--text));
+      font-size: 12.5px;
+      line-height: 1.55;
+    }
+    .customProblem .glyph{ width: 15px; height: 15px; margin-top: 2px; flex: 0 0 auto; }
+
+    /* The end of the settings list, and the one thing in that dialog which is not a
+       preference but an action on all of them. Separated by a rule so it reads as a
+       footer rather than as another row. */
+    .setFooter{
+      display: flex;
+      align-items: center;
+      gap: var(--s3);
+      flex-wrap: wrap;
+      margin-top: var(--s5);
+      padding-top: var(--s3);
+      border-top: 1px solid var(--line2);
+    }
+    .setFooterNote{ color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+    /* Armed: one press asks, the next acts. Used by the two actions undo cannot
+       reach — resetting every preference, and reverting a custom competition. */
+    [data-action="resetSettings"][data-armed="1"],
+    [data-action="revertCustom"][data-armed="1"],
+    [data-action="emptyCustom"][data-armed="1"]{
+      background: color-mix(in srgb, var(--danger) 26%, transparent);
+      border-color: color-mix(in srgb, var(--danger) 62%, transparent);
+      color: color-mix(in srgb, var(--danger) 92%, var(--text));
+    }
+
+    /* The division color swatch, wherever a division is named and settable — which
+       is now the competition dialog's own table, one per row. */
+    .swatchInput{
+      width: 26px;
+      height: var(--h-pill);
+      min-height: 0;
+      flex: 0 0 auto;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      background: var(--panel2);
+      cursor: pointer;
+    }
+    /* The wrapper padding and the part's radius come from input[type="color"] above,
+       so this swatch and the Settings one curve the same way. */
+    .swatchInput:focus-visible{ box-shadow: var(--focusRing); }

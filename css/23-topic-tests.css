@@ -1,0 +1,274 @@
+    /* ============================================================
+       Topic tests
+       ============================================================ */
+
+    .topicPrefixBar{
+      margin-top: var(--s3);
+      padding-top: var(--s3);
+      border-top: 1px solid var(--line2);
+      gap: var(--s3);
+    }
+    /* names the two input columns once, instead of four repeated header rows */
+    .topicLegend{
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: var(--s3);
+      padding: var(--s2) var(--s3);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--panel2);
+      color: var(--muted);
+      font-size: 11.5px;
+      line-height: 1.5;
+    }
+    .topicLegend strong{ color: var(--text); font-weight: 750; }
+
+    /* Two columns of cards when two cards fit, one when they do not.
+       "When they fit" is measured on the box the cards are actually in, not on the
+       window. The menu this grid lives in is `min(660px, 92vw)` wide, so from about
+       720px of viewport upward it is 660px and stops growing — but the old rule
+       switched to one column at a 860px *window*, which is 200px above the point the
+       menu itself stopped changing size. Between those two numbers the dropdown was
+       exactly as wide as it is on a desktop and showed half as many cards.
+
+       #topicTestsBox is the query container, so the threshold is the room the cards
+       have. 560px is two cards of 274 with a gap between them: after the card's own
+       frame and the five things queued to the right of the name field, that leaves a
+       name box of about 100px — enough to read a title back while typing it, and the
+       field scrolls its own text past that. At the menu's full width the container is
+       around 625px and the boxes are half as wide again. */
+    #topicTestsBox{ container-type: inline-size; container-name: topicBox; }
+    .topicGrid{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--s3);
+      margin-top: var(--s3);
+    }
+    @container topicBox (min-width: 560px){
+      .topicGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .topicCard[hidden]{ display: none; }
+
+    /* The card used to carry a "For Theta, Alpha" line under its heading, because the
+       heading named a family and the family was not the division. The heading is the
+       division now, so the line was repeating it. */
+    .topicCard{
+      /* Tighter left-right than top-bottom on purpose: the row inside it is a name
+         field with five things queued to its right, and every pixel of padding comes
+         straight off the name. */
+      padding: var(--s3) var(--s2);
+      border: 1px solid var(--line2);
+      border-left: 3px solid var(--famColor, var(--line));
+      border-radius: var(--r-md);
+      background: var(--panel2);
+    }
+    /* --famColor and the tint are set per card in renderTopicTestGrid, because
+       which division a family belongs to depends on the competition */
+    .topicHead{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s2);
+      margin-bottom: var(--s3);
+    }
+    .topicRows{ display: flex; flex-direction: column; gap: var(--s2); }
+    .topicRow{ display: flex; align-items: center; gap: var(--s1); min-width: 0; }
+    .topicRow.isTbd .topicInput{ color: var(--muted); }
+    /* The division's TBD, stated rather than typed. It sits last in the card because
+       that is where the picker offers it, and the card is a preview of the picker.
+       Nothing here is a field: TBD is the option you take when there is no name yet,
+       so there is nothing to fill in and the row says so instead of pretending. */
+    .topicTbdRow{
+      min-height: var(--h-sm);
+      padding-top: 2px;
+      color: var(--muted);
+    }
+    .topicTbdName{
+      flex: 0 0 auto;
+      padding-left: var(--s2);
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+    .topicTbdNote{
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-left: var(--s1);
+      font-size: 11px;
+    }
+
+    /* How many students are sitting this test.
+       It is the answer to the question the card cannot otherwise be asked — "is
+       anyone on this one?" — which is exactly what you need before deleting a row or
+       moving it, and it is the reason the delete beside it can be pressed with your
+       eyes open. Absent rather than zero when nobody is on it: a column of 0s is
+       noise, and a number appearing is what says something happened. */
+    .topicUse{
+      flex: 0 0 auto;
+      min-width: 20px;
+      padding: 1px 5px;
+      border-radius: var(--r-pill);
+      border: 1px solid var(--line2);
+      background: var(--tintStrong);
+      color: var(--text);
+      font-size: 10.5px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      cursor: help;
+    }
+
+    /* Reorder and delete, one row at a time.
+       Always drawn, never revealed on hover: this is a settings panel someone visits
+       once a season, and a control you have to discover by waving the pointer at it
+       is a control most people never find. They are small because the name field
+       beside them is the part that needs the width — 20px is still a comfortable
+       target, and the pair of arrows reads as one stepper. */
+    .topicRowActs{ display: inline-flex; align-items: center; gap: 2px; flex: 0 0 auto; }
+    .topicRowBtn{
+      width: 20px;
+      min-width: 20px;
+      min-height: 20px;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: var(--r-sm);
+      background: transparent;
+      color: var(--muted);
+    }
+    .topicRowBtn:hover:not(:disabled){ background: var(--btn); border-color: var(--line2); color: var(--text); }
+    .topicRowBtn:focus-visible{ box-shadow: var(--focusRing); }
+    .topicRowBtn:disabled{ opacity: 0.28; cursor: default; }
+    .topicRowBtn .glyph{ width: 12px; height: 12px; margin: 0 auto; }
+    .topicRowBtn.isDanger:hover:not(:disabled){
+      background: color-mix(in srgb, var(--danger) 16%, transparent);
+      border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+      color: color-mix(in srgb, var(--danger) 88%, var(--text));
+    }
+    /* Armed: one press asks, a second one does it. The same two-press pattern the
+       Settings reset and the custom editor's Revert use, and for the same reason —
+       it is reversible by not pressing again, and needs no dialog. */
+    .topicRowBtn.isDanger[data-armed="1"]{
+      background: color-mix(in srgb, var(--danger) 22%, transparent);
+      border-color: color-mix(in srgb, var(--danger) 62%, transparent);
+      color: color-mix(in srgb, var(--danger) 92%, var(--text));
+    }
+    /* just a row number: the key it used to show (T-1) is storage, not information */
+    .topicIdx{
+      flex: 0 0 auto;
+      min-width: 14px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+    input.topicInput{
+      flex: 1 1 auto;
+      min-width: 0 !important;
+      min-height: var(--h-sm);
+      padding: 0 var(--s2);
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-sm);
+      font: inherit;
+      font-size: 12.5px;
+      outline: none;
+    }
+    input.topicCodeInput{
+      flex: 0 0 auto;
+      width: 52px !important;
+      min-width: 52px !important;
+      max-width: 52px !important;
+      min-height: var(--h-sm);
+      padding: 0 2px;
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-sm);
+      font-family: var(--mono);
+      font-size: 12.5px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+    input.topicPrefixInput{
+      width: 116px;
+      min-width: 0 !important;
+      min-height: var(--h-sm);
+      padding: 0 var(--s2) !important;
+      background: var(--panel) !important;
+      border-radius: var(--r-sm) !important;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    input.topicInput:focus, input.topicCodeInput:focus, input.topicPrefixInput:focus{
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+      box-shadow: var(--focusRing);
+    }
+    html[data-noprefix="1"] .topicPrefixInput{ opacity: 0.4; pointer-events: none; }
+    .topicPrefixField{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* The list in sections: the two categories this student belongs to, then
+       everybody else's. Both fold, because a section you can open is a section you
+       can shut, and one of the two behaving differently from the other is the odd
+       thing to explain. Recommended opens with the panel; More does not.
+
+       The heading is the popover title's own type, one level down. It is also
+       pressable, and what says so is the chevron rather than a box: a background on
+       hover would have to be inset from the panel's edge, and that would push the
+       word off the x every other thing in this list starts at. */
+    .topicSection{ width: 100%; }
+    /* everything above the second section belongs to this student and everything
+       inside it belongs to somebody else, which is more than a 4px gap can say */
+    .topicSection + .topicSection{
+      margin-top: var(--s3);
+      padding-top: var(--s3);
+      border-top: 1px solid var(--line2);
+    }
+    .topicSection > summary{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      list-style: none;
+      cursor: pointer;
+      min-height: var(--h-sm);
+      /* flush left with the option boxes, the division pills and the panel's own
+         title — the whole menu starts at one x */
+      padding: 0;
+      border-radius: var(--r-sm);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .topicSection > summary::-webkit-details-marker{ display: none; }
+    .topicSection > summary::after{
+      content: "";
+      width: 6px;
+      height: 6px;
+      margin-left: auto;
+      margin-right: 2px;
+      border-right: 1.6px solid currentColor;
+      border-bottom: 1.6px solid currentColor;
+      transform: translateY(-2px) rotate(45deg);
+    }
+    .topicSection[open] > summary::after{ transform: translateY(1px) rotate(-135deg); }
+    .topicSection > summary:hover{ color: var(--text); }
+    .topicSection > summary:focus-visible{ box-shadow: var(--focusRing); }
+    /* a section's own rows are the list's rows, so it keeps the list's gap */
+    .topicSectionList{ display: flex; flex-direction: column; gap: var(--s1); margin-top: var(--s1); }
+
+    html.no-topic-tests .topicCol{ display: none !important; }
+    html.no-topic-tests col.stuColTopic{ display: none; }
+

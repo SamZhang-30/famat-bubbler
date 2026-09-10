@@ -1,0 +1,781 @@
+    /* ============================================================
+       Row actions
+       ============================================================ */
+    /* The three sit in one cell under one heading — nothing divides them, and each
+       is bounded by its own ring instead, which is what says it is a control before
+       anyone hovers it. The cell's padding holds the outer two off the column's
+       edges by more than they are held off each other, so the set reads as a group
+       rather than as three things that happen to be adjacent. */
+    #studentsRoot td.actCol,
+    #studentsRoot th.actCol{ padding-left: 10px; padding-right: 10px; }
+    .rowActs{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--s2);
+    }
+    .rowAct{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--h-row);
+      min-width: var(--h-row);
+      height: var(--h-row);
+      min-height: var(--h-row);
+      padding: 0;
+      /* was a bare 50%, which is the same circle a pill draws on a square box but
+         off the token scale, so it drifted from the pills beside it */
+      border-radius: var(--r-pill);
+      border: 1px solid var(--line2);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+    .rowAct .glyph{ width: 14px; height: 14px; }
+    .rowAct:hover:not(:disabled){ color: var(--text); border-color: var(--line); background: var(--tint); }
+    .rowAct.danger:hover:not(:disabled){ color: var(--danger); border-color: color-mix(in srgb, var(--danger) 55%, transparent); }
+    .rowAct:disabled{ opacity: 0.3; cursor: not-allowed; }
+
+    .cellInput{
+      width: 100%;
+      min-width: 0 !important;
+      min-height: var(--h-row);
+      padding: calc(var(--rowPadY) + 1px) var(--s2);
+      border: 1px solid transparent;
+      border-radius: var(--r-sm);
+      background: transparent;
+      color: inherit;
+      font-family: inherit;
+      font-size: var(--rowFont);
+      outline: none;
+      caret-color: var(--accent);
+    }
+    #studentsRoot input.cellInput{
+      background: transparent;
+      border-color: transparent;
+      /* input[type="text"] outranks a bare .cellInput, so the in-cell size is
+         restated here or every row inherits the standalone field height */
+      min-height: var(--h-row);
+      padding: calc(var(--rowPadY) + 1px) var(--s2);
+      font-size: var(--rowFont);
+    }
+    /* A name too long for its column used to stop mid-glyph — "Nguyen" rendering as
+       "Nguye" with nothing to say whether the field held more or the name was simply
+       wrong. For a tool whose entire output is printed names that is the wrong thing
+       to leave ambiguous, so the overflow is spelled: an ellipsis at rest, and the
+       field scrolls its own text normally once you are in it. */
+    #studentsRoot input.cellInput{ text-overflow: ellipsis; }
+    #studentsRoot input.cellInput:focus{ text-overflow: clip; }
+    #studentsRoot input.cellInput:hover{ background: var(--tint); }
+    #studentsRoot input.cellInput:focus{
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+      box-shadow: none;
+    }
+    /* Hovering anywhere in a row lights that row's fields. What gets lit is whichever
+       element is the cell's visible box — for a name that is the input, for the FAMAT ID
+       it is the wrapper around all eight digits, so the ID inputs opt out here and are
+       lit through .idFieldWrap below. Excluded at the source rather than overridden
+       afterwards: this selector is (1,3,2), which quietly outranks most attempts. */
+    #studentsRoot tbody tr[data-rowid]:hover .cellInput:not([data-field="id"]):not([data-field="idnum"]){ background: var(--tint); }
+
+    /*
+     * The ID reads as eight fixed slots. Everything that draws into them — the input's
+     * own text, the grayed placeholders behind it, the dimmed school and division
+     * segments, the remap overlay — is cut from one box at one size, so a digit always
+     * lands in the same place whichever layer is painting it.
+     *
+     * The centered field this replaces looked right at eight characters and nowhere
+     * else: the input centered however many digits were typed while the placeholder
+     * overlay centered all eight, so the gray x's sat left of where they belonged and
+     * moved on every keystroke. A fixed-width box, filled from the left, is the only
+     * arrangement in which a slot means the same thing at every length.
+     */
+    /*
+     * The outline box is the wrapper, which fills the cell. That is what makes its
+     * inset equal all the way round without a number to keep in step: left and right
+     * come from the cell's own padding, top and bottom from the same padding against a
+     * box the row is already as tall as. Sizing it to the eight slots instead left it
+     * floating in the middle of the column, inset four pixels vertically and eleven
+     * horizontally. It also matches the name fields either side, which fill their
+     * cells the same way.
+     */
+    .idFieldWrap{
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;   /* the eight-slot run, centered in the box */
+      width: 100%;
+      min-width: 0;
+      /* the row is built around the taller 13px fields; --h-row *is* that
+         measurement, so the cell's vertical padding is the whole vertical inset,
+         as it is horizontally */
+      min-height: var(--h-row);
+      border: 1px solid transparent;
+      border-radius: var(--r-sm);
+    }
+    /* Just the eight slots now — no box of its own, so nothing inside can disagree
+       with the outline about where the digits start. */
+    #studentsRoot .idField{
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      box-sizing: content-box;
+      font-family: var(--mono);
+      font-size: 12.5px;
+      letter-spacing: 0.04em;
+      /* tracking is applied after the last glyph too, so eight slots measure exactly this */
+      width: calc(8 * (1ch + 0.04em));
+      white-space: pre;
+    }
+    /* One face, one size, no box of their own: the layers must not shift each other. */
+    #studentsRoot .idFieldWrap .cellInput[data-field="id"],
+    #studentsRoot .idFieldWrap .cellInput[data-field="idnum"],
+    #studentsRoot .idSeg,
+    #studentsRoot .idSwap,
+    #studentsRoot .idGhost{
+      min-height: 0;
+      font: inherit;
+      letter-spacing: inherit;
+      padding-left: 0;
+      padding-right: 0;
+      border: 0;
+      text-align: left;
+    }
+    #studentsRoot .idFieldWrap .cellInput[data-field="id"],
+    #studentsRoot .idFieldWrap .cellInput[data-field="idnum"]{
+      position: relative;
+      z-index: 1;
+      flex: 0 0 auto;
+      width: 100%;
+      background: transparent;
+    }
+    /*
+     * Hovering the row lights the whole ID, the same as it lights the name fields
+     * beside it, and one click anywhere in it lights the same box again in the accent.
+     * The outline says "this is the ID you are on"; what is bright *inside* it says
+     * which of its digits that actually lets you change. Both are drawn on the
+     * wrapper's already-transparent border, so nothing moves when they appear, and a
+     * flag, a hover and a focus are all one rectangle.
+     *
+     * The hover rule carries :not(:focus-within) because being row-scoped makes it
+     * heavier than the focus rule below, which it would otherwise paint over.
+     */
+    #studentsRoot tbody tr[data-rowid]:hover .idFieldWrap:not(:focus-within){ background: var(--tint); }
+    #studentsRoot .idFieldWrap:focus-within{
+      border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+    /* ...so the input itself must not draw a second, smaller one inside it. The
+       attribute in the selector is only there to outrank the row-hover tint. */
+    #studentsRoot .idFieldWrap input.cellInput[data-field],
+    #studentsRoot .idFieldWrap input.cellInput[data-field]:hover,
+    #studentsRoot .idFieldWrap input.cellInput[data-field]:focus{
+      background: transparent;
+      box-shadow: none;
+    }
+
+    /* The three editable digits, in their own fixed sub-box so the two dimmed segments
+       beside them cannot be pushed around by what is typed. Geometry only: brightness
+       is what says which digits are yours, and a box around them as well was saying it
+       twice in a column that repeats three hundred times. */
+    .idNum{
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      box-sizing: content-box;
+      width: calc(3 * (1ch + 0.04em));
+    }
+
+    /* The School ID and the Division Number. Constant across a school and owned by
+       the row's Actions button respectively, so they are shown rather than offered.
+       Double-clicking the ID opens them anyway, because a roster can arrive with the
+       wrong prefix and that has to be fixable where you see it. */
+    .idSeg{
+      flex: 0 0 auto;
+      /* Taken down to where a disabled control sits, because that is what these are.
+         Brightness in this cell means one thing only — whether a digit is yours to
+         change — so it has to separate at a glance rather than on inspection, and
+         nothing else in the cell is left carrying the distinction. Both parts are
+         recoverable elsewhere anyway: the division has its own column, the school
+         prefix its own setting, and hovering the row brings them back up. */
+      color: var(--muted);
+      opacity: 0.42;
+      cursor: text;
+      user-select: none;
+    }
+    #studentsRoot tbody tr[data-rowid]:hover .idSeg,
+    .idFieldWrap:focus-within .idSeg{ opacity: 0.72; }
+
+    .idGhost{
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      white-space: pre;
+      overflow: hidden;
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+    .ghostTyped{ color: transparent; }
+    /* Full strength, like the digits they are standing in for. A placeholder slot is
+       one you can type into, and in this cell that is exactly what brightness means —
+       dimming it too would have said "not yours to change", which is the opposite. */
+    .ghostRest{ color: var(--text); }
+
+    /*
+     * A flagged ID reads as a bordered box rather than a chip beside the digits, so the
+     * column keeps one width whatever is wrong with the row. Red blocks the PDF; amber
+     * is worth a look.
+     *
+     * Drawn on the wrapper — the same box the hover and focus states use, on the same
+     * already-transparent border — so a flag, a hover and a focus are one rectangle
+     * rather than nested ones of different sizes. And a flag gives way while you are in
+     * the field: the two would otherwise stack, and the outline that matters when you
+     * are typing is the one saying where the caret is. The severity attribute stays put
+     * either way, so the hover bubble and aria-invalid are unaffected.
+     */
+    .idFieldWrap[data-sev="warn"],
+    .idFieldWrap[data-sev="fatal"]{ cursor: help; }
+
+    #studentsRoot .idFieldWrap[data-sev="warn"]:not(:focus-within){
+      border-color: color-mix(in srgb, var(--warn) 62%, transparent);
+      background: color-mix(in srgb, var(--warn) 9%, transparent);
+    }
+    #studentsRoot .idFieldWrap[data-sev="fatal"]:not(:focus-within){
+      border-color: color-mix(in srgb, var(--danger) 85%, transparent);
+      /* thickens the same 1px border inward instead of widening the box */
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 55%, transparent);
+      background: color-mix(in srgb, var(--danger) 11%, transparent);
+    }
+    #studentsRoot tbody tr[data-rowid]:hover .idFieldWrap[data-sev="warn"]:not(:focus-within){ background: color-mix(in srgb, var(--warn) 16%, transparent); }
+    #studentsRoot tbody tr[data-rowid]:hover .idFieldWrap[data-sev="fatal"]:not(:focus-within){ background: color-mix(in srgb, var(--danger) 18%, transparent); }
+
+    /* The same two colors on a name field, for the same reason and by the same rule:
+       the flag steps aside while you are in the field, because the outline that matters
+       mid-edit is the one showing where the caret is. This is the only thing that can
+       flag a name, and it is on the name — a character the sheet cannot carry used to
+       be reported against the ID box, which is a different field with different faults. */
+    #studentsRoot input.cellInput[data-sev="warn"],
+    #studentsRoot input.cellInput[data-sev="fatal"]{ cursor: help; }
+    #studentsRoot input.cellInput[data-sev="warn"]:not(:focus){
+      border-color: color-mix(in srgb, var(--warn) 62%, transparent);
+      background: color-mix(in srgb, var(--warn) 9%, transparent);
+    }
+    #studentsRoot input.cellInput[data-sev="fatal"]:not(:focus){
+      border-color: color-mix(in srgb, var(--danger) 85%, transparent);
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 55%, transparent);
+      background: color-mix(in srgb, var(--danger) 11%, transparent);
+    }
+    #studentsRoot tbody tr[data-rowid]:hover input.cellInput[data-sev="warn"]:not(:focus){ background: color-mix(in srgb, var(--warn) 16%, transparent); }
+    #studentsRoot tbody tr[data-rowid]:hover input.cellInput[data-sev="fatal"]:not(:focus){ background: color-mix(in srgb, var(--danger) 18%, transparent); }
+
+    /* the same two colors as the ID outlines, inline in the note that explains them */
+    .sevKey{
+      display: inline-block;
+      padding: 0 5px;
+      border-radius: var(--r-sm);
+      font-weight: 750;
+    }
+    .sevKey[data-sev="fatal"]{
+      box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--danger) 78%, transparent);
+      background: color-mix(in srgb, var(--danger) 11%, transparent);
+      color: color-mix(in srgb, var(--danger) 85%, var(--text));
+    }
+    .sevKey[data-sev="remap"]{ color: var(--accentInk); font-weight: 800; padding: 0; }
+    .sevKey[data-sev="warn"]{
+      box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--warn) 62%, transparent);
+      background: color-mix(in srgb, var(--warn) 9%, transparent);
+      color: color-mix(in srgb, var(--warn) 85%, var(--text));
+    }
+
+    /* roster ID above the sheet ID, so the one changed digit lines up between them */
+    .idConvert{
+      display: grid;
+      grid-template-columns: max-content max-content;
+      justify-content: start;
+      align-items: baseline;
+      gap: 3px var(--s2);
+      margin-top: var(--s2);
+    }
+    .idConvertKey{
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    .idConvert code{
+      background: var(--tint);
+      padding: 1px 6px;
+      border-radius: var(--r-sm);
+      color: var(--text);
+      font-size: 12.5px;
+      letter-spacing: 0.04em;
+    }
+    .idConvert code b{ font-weight: inherit; }
+    .idConvert code b.swapDigit{ color: var(--accentInk); }
+    .bubbleRule{ margin: var(--s3) 0; border: 0; border-top: 1px solid var(--line2); }
+
+    /* severity, said out loud in the bubble */
+    .sevTag{
+      display: inline-block;
+      margin-right: var(--s1);
+      padding: 0 5px;
+      border-radius: var(--r-pill);
+      font-size: 9.5px;
+      font-weight: 850;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      vertical-align: 1px;
+    }
+    .sevTag[data-sev="fatal"]{
+      background: color-mix(in srgb, var(--danger) 22%, transparent);
+      color: color-mix(in srgb, var(--danger) 85%, var(--text));
+    }
+    .sevTag[data-sev="warn"]{
+      background: color-mix(in srgb, var(--warn) 22%, transparent);
+      color: color-mix(in srgb, var(--warn) 85%, var(--text));
+    }
+    .rowErrHead[data-sev="fatal"]{ color: color-mix(in srgb, var(--danger) 80%, var(--text)); }
+
+    .rowErrHead{ color: var(--text); font-weight: 800; margin-bottom: var(--s1); }
+    .rowErrList{ margin: 0; padding-left: var(--s4); }
+    .rowErrList li{ margin-bottom: var(--s1); }
+    .rowErrList li:last-child{ margin-bottom: 0; }
+    .rowErrList strong{ color: var(--text); }
+    /* The same list, standing on its own inside the severity pill's bubble. It is one
+       problem per entry rather than one per row, so the entries are further apart and
+       each carries a button — a bullet and a 4px gap would run them together. */
+    .issueList{ list-style: none; padding-left: 0; }
+    .issueList > li{
+      padding: var(--s2) 0;
+      border-top: 1px solid var(--line2);
+    }
+    .issueList > li:first-child{ padding-top: var(--s1); border-top: 0; }
+
+    /* team / topic pickers in a row */
+    /* Matched to .includeBtn: both are per-row pills and the pair should read as one
+       kind of control. The plain button chrome flattened against a tinted row. */
+    .teamBtn{
+      min-height: var(--h-row);
+      min-width: 38px;
+      line-height: 1;   /* its own, so the cell below can zero the strut */
+      padding: 0 var(--s2);
+      border-radius: var(--r-pill);
+      border: 1px solid var(--line);
+      background: var(--tint);
+      font-size: var(--rowFont);
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+    .teamBtn:hover{ background: var(--btnHover); border-color: var(--line); }
+    /* The Test cell is a quiet field, not a pill: it reads as a line of the row and
+       only picks up a button's chrome under the pointer. */
+    .topicPick{
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      width: 100%;
+      max-width: 100%;
+      /* the same box as .cellInput beside it: 1px border, the same padding and the
+         same height token, so the two sit on one line across the row */
+      min-height: var(--h-row);
+      padding: calc(var(--rowPadY) + 1px) var(--s2);
+      line-height: normal;
+      justify-content: flex-start;
+      background: transparent;
+      border-color: transparent;
+      /* --r-md, matching the name fields: both are cells you edit in place. It used
+         to be --r-sm, which made it the odd corner in the row. */
+      border-radius: var(--r-md);
+      font-size: var(--rowFont);
+      font-weight: 600;
+      letter-spacing: 0;
+      overflow: hidden;
+    }
+    .topicPick:hover{ background: var(--btn); border-color: var(--line2); }
+    /* One spelling for "inert", not two.
+       The row used to say this twice in two ways: a Team that cannot be set showed a
+       0 inside a dashed pill, and a Test that cannot be set showed a bare em-dash in
+       no container at all. The dashed outline is the better of the two — it says
+       "there is a control here, it just cannot act right now" — so it is the only
+       one. Both then carry the same `cursor: help` and both explain themselves. */
+    .topicPick:disabled{
+      background: transparent;
+      border-style: dashed;
+      border-color: var(--line2);
+      color: var(--muted);
+      cursor: help;
+    }
+    .topicPick:disabled .testDefault{ opacity: 0.85; }
+    /* The prefix and the test name are one string on the sheet, so they are one
+       string here and they truncate once, at the right-hand end.
+       They used to be two flex children, each with its own ellipsis, so a narrow
+       column cut both of them and printed "The\2026 Logarit\2026" \2014 two cuts in a line
+       that goes onto the PDF as a single unbroken field. The wrapper is what
+       ellipses now; the two spans inside it are ordinary inline text and only carry
+       their own color and weight. */
+    .topicPick .testLine{
+      flex: 0 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .topicPick .testDefault{
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    /* the division name a student falls back to is the default, not a choice */
+    .topicPick .testDefault{ color: var(--muted); font-weight: 500; }
+    .topicPick .testName{ color: var(--text); font-weight: 700; }
+    .topicPick .testName.isTbd{ color: var(--muted); font-weight: 600; }
+    /* Which category the test came from, in that division's color. Mixed toward the
+       text so the pastels hold their contrast on white as well as on the dark.
+
+       data-divink, not data-divpill. The pill attribute is the whole paint job — a
+       filled background and the dark ink that goes on it — and it is set on a bare
+       [data-divpill] selector, so anything wearing the attribute gets the fill whether
+       it asked for it or not. Putting it on this span turned a colored word into a
+       colored highlighter stroke with the word lost inside it. The two are different
+       jobs: a pill is a label with a shape, this is a word that happens to be tinted,
+       so it gets its own attribute and takes the color as ink only. */
+    .topicPick .testFam{
+      font-weight: 800;
+      color: var(--muted);
+    }
+    .topicPick .testFam[data-divink="1"]{ color: color-mix(in srgb, var(--div1) 62%, var(--text)); }
+    .topicPick .testFam[data-divink="2"]{ color: color-mix(in srgb, var(--div2) 62%, var(--text)); }
+    .topicPick .testFam[data-divink="3"]{ color: color-mix(in srgb, var(--div3) 62%, var(--text)); }
+    .topicPick .testFam[data-divink="4"]{ color: color-mix(in srgb, var(--div4) 62%, var(--text)); }
+    .topicPick .testFam[data-divink="5"]{ color: color-mix(in srgb, var(--div5) 62%, var(--text)); }
+    .topicPick .testFam[data-divink="6"]{ color: color-mix(in srgb, var(--div6) 62%, var(--text)); }
+
+    /* Teams are not entered at a convention, but the column stays: a 0 is going onto
+       every sheet and hiding the column would hide that. The cell shows the 0 it will
+       bubble, locked and grayed, and says why on hover.
+       
+       The buttons follow the same rule now. They used to be removed outright, four
+       lines below the comment arguing that removing things hides the rule — so the
+       list toolbar silently went from two icons to one and the Summary lost a button
+       per division. Disabled, they keep the toolbar's shape and can still say why;
+       a missing button can do neither. JS sets `disabled` so they leave the tab
+       order too. */
+    html[data-noteams="1"] [data-action="fixTeams"],
+    html[data-noteams="1"] [data-action="fixTeamsAll"],
+    html[data-noteams="1"] [data-action="openFillTeams"],
+    html[data-noteams="1"] #btnBatchTeam{ opacity: 0.4; cursor: help; }
+    html[data-noteams="1"] [data-action="fixTeams"]:hover,
+    html[data-noteams="1"] [data-action="fixTeamsAll"]:hover,
+    html[data-noteams="1"] [data-action="openFillTeams"]:hover,
+    html[data-noteams="1"] #btnBatchTeam:hover{ background: var(--btn); }
+    /* A character the field would not take. Brief and red, so the letter that did
+       not appear reads as refused rather than as a dropped keystroke. */
+    @keyframes fieldReject{
+      0%   { border-color: var(--danger); box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 30%, transparent); }
+      100% { border-color: var(--danger); box-shadow: 0 0 0 0 transparent; }
+    }
+    input.isRejecting{
+      border-color: var(--danger) !important;
+      animation: fieldReject 520ms ease-out;
+    }
+    @media (prefers-reduced-motion: reduce){
+      input.isRejecting{ animation: none; }
+    }
+
+    /* Locked, but still visibly a control: a dashed edge says "this is a field that
+       cannot be changed here", where no edge at all read as plain text. */
+    .teamBtn.isLocked{
+      background: transparent;
+      border-style: dashed;
+      border-color: var(--line);
+      color: var(--muted);
+      cursor: help;
+    }
+    .teamBtn.isLocked:hover{ background: var(--tint); border-color: var(--muted); }
+
+    /* Added toggle — deliberately not a checkbox, the selection column already has one */
+    .includeBtn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--h-row);
+      padding: 0 9px;
+      border-radius: var(--r-pill);
+      border: 1px solid var(--line2);
+      background: var(--tint);
+      cursor: pointer;
+      user-select: none;
+      line-height: 1;
+    }
+    .includeBtn:hover{ background: var(--tintStrong); }
+    .incGlyph{
+      width: 15px;
+      height: 15px;
+      display: block;
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .includeBtn:hover .incGlyph{ stroke: var(--text); }
+    .includeBtn[aria-pressed="true"]{
+      border-color: color-mix(in srgb, var(--ok) 45%, transparent);
+      background: color-mix(in srgb, var(--ok) 16%, transparent);
+    }
+    .includeBtn[aria-pressed="true"] .incGlyph{ stroke: var(--ok); }
+    .includeBtn[aria-pressed="true"]:hover{ background: color-mix(in srgb, var(--ok) 26%, transparent); }
+    .includeBtn[aria-pressed="true"]:hover .incGlyph{ stroke: var(--ok); }
+    .includeBtn:focus-visible{ box-shadow: var(--focusRing); }
+
+    /* row states
+       ------------------------------------------------------------------
+       The ring around a flagged row is a pseudo-element rather than an outline.
+       An outline paints all four sides at once and cannot be drawn per side, so
+       two ringed rows sitting next to each other each painted an edge on the
+       boundary they share: the line between them came out 4px where the rest of
+       the ring was 2px, and a run of selected rows read as banded. Borders can be
+       set per side, so the lower row drops its top edge when the row above is
+       ringed too, and every boundary — inside a run or at either end — is one 2px
+       line. The ring sits inside the row's box, where outline-offset: -2px had it.
+
+       Colors stay custom properties so the three states keep sharing one ::after
+       rule, and so a row in more than one state resolves the same way the single
+       outline property used to: last declaration wins, blocking above dup above
+       selected.
+
+       Team overflow is deliberately *not* one of them any more. A whole row banded in
+       red said "this student is wrong", when the student is fine and the team they are
+       on has one seat too many — and it said it about four rows at once, one per
+       member of that team, which is four accusations for one fault. It is marked on
+       the Team cell instead, in amber, a few rules down. */
+    tr[data-selected="1"]{ --rowRing: color-mix(in srgb, var(--accent) 48%, transparent); }
+    tr[data-dup="1"]{ --rowRing: color-mix(in srgb, var(--danger) 45%, transparent); }
+    /* Any added row the PDF is actually stuck on — a broken ID, a duplicate number, an
+       unprintable character in a name. The field at fault is outlined too; this is the
+       row saying "the thing stopping the PDF is in here", so the list can be scanned
+       for it rather than hovered cell by cell. */
+    tr[data-blocking="1"]{ --rowRing: color-mix(in srgb, var(--danger) 62%, transparent); }
+    tr[data-selected="1"],
+    tr[data-dup="1"],
+    tr[data-blocking="1"]{ position: relative; }
+    tr[data-selected="1"]::after,
+    tr[data-dup="1"]::after,
+    tr[data-blocking="1"]::after{
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 2px solid var(--rowRing);
+      pointer-events: none;
+    }
+    /* the boundary two ringed rows share belongs to the one above */
+    :is(tr[data-selected="1"], tr[data-dup="1"], tr[data-blocking="1"])
+      + :is(tr[data-selected="1"], tr[data-dup="1"], tr[data-blocking="1"])::after{ border-top-width: 0; }
+
+    /* Too many on one team, marked where the fault is: the Team cell, in the amber
+       this app uses for "worth a look" everywhere else. It is not fatal — an
+       over-full team still prints — so it must not wear the red that means the PDF
+       has stopped.
+
+       A ring rather than a fill, so the cell keeps reading as the control it is, and
+       drawn as a shadow rather than an outline so it follows the pill's own radius. */
+    tr[data-over="1"] .teamBtn{
+      border-color: color-mix(in srgb, var(--warn) 70%, transparent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--warn) 34%, transparent);
+      color: color-mix(in srgb, var(--warn) 82%, var(--text));
+    }
+    tr[data-over="1"] .teamBtn:hover{
+      border-color: color-mix(in srgb, var(--warn) 85%, transparent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--warn) 48%, transparent);
+    }
+
+    /* At the foot of the table the ring is the innermost thing inside a rounded
+       frame — the scroll viewport's corner in the anchored layout, the table's own
+       in the flat one, both var(--r-md) outside a 1px border — so it curves to the
+       same center, one border-width in. A square corner sitting in that curve cut
+       across it. Only the foot needs this: the head of every table is a heading row,
+       which is never ringed.
+
+       Which row is the foot is asked as "no visible row after this one", not
+       :last-child, because the search hides rows where they stand: with a filter on,
+       the row at the bottom of the frame is usually not the last child. */
+    :is(tr[data-selected="1"], tr[data-dup="1"], tr[data-blocking="1"]):not(:has(~ tr:not([data-hidden="1"])))::after{
+      border-bottom-left-radius: calc(var(--r-md) - 1px);
+      border-bottom-right-radius: calc(var(--r-md) - 1px);
+    }
+    tr[data-hidden="1"]{ display: none; }
+    html[data-zebra="1"] #studentsRoot tbody tr[data-rowid]:nth-of-type(even) td{
+      box-shadow: inset 0 0 0 999px var(--tint);
+    }
+
+    /* sticky column headers, pinned just under the list toolbar */
+    html[data-stickyhead="1"] #studentsRoot tbody tr:first-child th{
+      position: sticky;
+      top: calc(var(--pageHeadH, 0px) + var(--listBarH, 44px));
+      z-index: 4;
+      box-shadow: 0 1px 0 var(--line2);
+    }
+
+    /* division panels */
+    #divScroll{
+      display: flex;
+      flex-direction: column;
+      gap: var(--s3);
+    }
+    #divScroll > [data-divpanel]{ margin: 0; }
+    /* One outline, in the division's own color, the same width the whole way round.
+       It was a 3px stripe down the left edge and a 1px line on the other three, which
+       is two borders on one box: the card read as a plain panel wearing a marker
+       rather than as the division's own card, and the heavier left edge pushed the
+       content off the inset every other box on the page keeps. Uniform, the color is
+       the card. */
+    [data-divpanel]{
+      margin: var(--s2) 0;
+      padding: var(--s3);
+      border-color: var(--divStripe, var(--line2));
+    }
+    [data-divcolor="1"]{ --divStripe: var(--div1); }
+    [data-divcolor="2"]{ --divStripe: var(--div2); }
+    [data-divcolor="3"]{ --divStripe: var(--div3); }
+    [data-divcolor="4"]{ --divStripe: var(--div4); }
+    [data-divcolor="5"]{ --divStripe: var(--div5); }
+    [data-divcolor="6"]{ --divStripe: var(--div6); }
+    [data-divcolor="0"]{ --divStripe: var(--div0); }
+    html[data-hideempty="1"] [data-divpanel][data-empty="1"]{ display: none; }
+    /* a division this competition does not use is not hidden by preference — it does not exist */
+    [data-divpanel][data-unused="1"]{ display: none !important; }
+
+    .divHeader{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s3);
+      flex-wrap: wrap;
+    }
+    .divHeaderLeft{ display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+    /* The Summary heading is the same pill, one step up: it heads a card rather than
+       labelling a row, and it is the thing you press to open the roll. It takes its
+       colors from the shared [data-divpill] set above — the markup carries both
+       attributes — so only the size is written here. */
+    .divTitle{
+      display: inline-flex;
+      align-items: center;
+      margin: 0;
+      padding: 0 var(--s3);
+      min-height: calc(var(--h-pill) + 4px);
+      border-radius: var(--r-pill);
+      border: 1px solid rgba(255,255,255,0.12);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    html[data-theme="light"] .divTitle{ border-color: rgba(15,23,42,0.16); }
+
+    /* open / close chevron, which now hides the roll rather than a table */
+    .divToggle{
+      width: var(--h-sm);
+      min-height: var(--h-sm);
+      padding: 0;
+      border-radius: var(--r-pill);
+    }
+    .divToggle .glyph{ width: 13px; height: 13px; transition: transform 140ms ease; }
+    [data-divpanel][data-rollopen="1"] .divToggle .glyph{ transform: rotate(180deg); }
+
+    [data-divpanel] .divSummary{ display: none; }
+    [data-divpanel][data-rollopen="1"] .divSummary{ display: block; }
+    /* Flush, the way the table is flush inside its own frame. This was a second
+       rounded rectangle floating 12px inside the first, which is the arrangement the
+       list gave up: two frames, thirteen pixels apart, the inner one carrying nothing
+       the outer one was not already saying. The negative margins take the roll out to
+       the card's padding box on three sides, so the card's outline is the only frame
+       and the roll is what fills it. The radius steps down by the border it sits
+       inside, which is what makes the two corners concentric. */
+    .divSummary{
+      margin: var(--s3) calc(var(--s3) * -1) calc(var(--s3) * -1);
+      padding: var(--s2) var(--s3);
+      border: 0;
+      border-top: 1px solid var(--line2);
+      border-radius: 0 0 calc(var(--r-md) - 1px) calc(var(--r-md) - 1px);
+      background: var(--panel2);
+      color: var(--text);
+      white-space: pre-wrap;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    /* Nothing to roll yet. A monospace box is for the team and topic rolls — columns
+       of names that want a fixed pitch. A one-line hint about what will appear there
+       is prose, so it is set as prose and loses the box it does not need. */
+    /* ...but the hint is prose, not a roll, so it keeps the card's inset rather than
+       being pulled out to an edge it has no frame to meet. */
+    .divSummary[data-empty="1"]{
+      margin: var(--s2) 0 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 12px;
+    }
+    .divSummary[data-empty="1"]:empty{ display: none; }
+
+    /* the pill names the division a row is in; it is a label, not a control */
+    /* A custom competition can name a division anything. The pill is nowrap like every
+       badge, so without this a long one would spill across the column rule into the
+       name beside it; truncated, it stays in its own cell and the full text is still on
+       the row's Change Division action. */
+    .divPill{
+      cursor: default;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* flex, not inline-block: the pill has to be able to take --h-row and centre
+         its own text inside it like every other control on the row */
+      display: inline-flex;
+      align-items: center;
+      min-height: var(--h-pill);
+      line-height: 1;
+    }
+    /* One set of colors for every division pill in the app, whichever element is
+       wearing it — the row, the Summary heading, the filter facet, Fill Teams, the
+       competition table, the Test-field captions and the division picker. They used
+       to be written twice, once for .divPill and again for .divTitle, which is two
+       places for the same six colors to drift apart. */
+    [data-divpill="1"]{ background: var(--div1); color: rgba(15,17,21,0.82); }
+    [data-divpill="2"]{ background: var(--div2); color: rgba(15,17,21,0.82); }
+    [data-divpill="3"]{ background: var(--div3); color: rgba(15,17,21,0.82); }
+    [data-divpill="4"]{ background: var(--div4); color: rgba(15,17,21,0.82); }
+    [data-divpill="5"]{ background: var(--div5); color: rgba(15,17,21,0.82); }
+    [data-divpill="6"]{ background: var(--div6); color: rgba(15,17,21,0.82); }
+    /* Same dark ink as every other division pill: --div0 is a solid pastel now,
+       not the translucent white it used to be in dark mode. */
+    [data-divpill="0"]{ background: var(--div0); color: rgba(15,17,21,0.82); }
+
+    /* empty state for the whole list */
+    .emptyState[hidden]{ display: none !important; }
+    .emptyState{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--s3);
+      padding: var(--s6) var(--s4);
+      margin: var(--s3) 0;
+      border: 1px dashed var(--line);
+      border-radius: var(--r-lg);
+      background: var(--panel2);
+      text-align: center;
+    }
+    .emptyState .glyph{ width: 30px; height: 30px; stroke: var(--muted); opacity: 0.7; }
+    .emptyTitle{ font-size: 15px; font-weight: 750; color: var(--text); }
+    .emptyBody{ max-width: 460px; font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+

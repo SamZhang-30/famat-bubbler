@@ -1,0 +1,318 @@
+    /* ============================================================
+       Popovers and modals
+       ============================================================ */
+
+    .popover{
+      position: absolute;
+      z-index: 60;
+      display: none;
+      flex-direction: column;
+      min-width: 168px;
+      padding: var(--s2);
+      background: var(--panel3);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+    }
+    .popover[data-open="1"]{ display: flex; }
+    .popoverTitle{
+      display: flex;
+      align-items: center;
+      gap: var(--s1);
+      flex-wrap: wrap;
+      margin-bottom: var(--s2);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .popover .pRow{ display: flex; gap: var(--s1); flex-wrap: wrap; }
+    .popover .pCol{ flex-direction: column; flex-wrap: nowrap; min-width: 190px; }
+    .popover .pCol button{
+      justify-content: flex-start;
+      width: 100%;
+      text-align: left;
+    }
+    .popover .pCol button[aria-pressed="true"]{
+      border-color: var(--accent);
+      color: var(--accentInk);
+    }
+    /* An option that names two things: what you are picking, and what the sheet will
+       call it. The second is an aside — quieter, and pushed to the far edge so the
+       names down the left stay a clean column to read. */
+    .popover .pCol button{ gap: var(--s2); }
+    .pickName{ flex: 0 0 auto; }
+    .pickAside{
+      display: inline-flex;
+      align-items: center;
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 650;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .pickAsideWarn{ color: color-mix(in srgb, var(--warn) 82%, var(--text)); }
+    /* The picker shows one chip per row, six rows deep, so the pill is set shorter
+       here than it is on a student's row. It is a label being read down a list rather
+       than a control sized to sit level with the row's buttons. */
+    #divisionPopover .divPill{
+      min-height: calc(var(--h-pill) * 0.76);
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .popoverNote{
+      margin-top: var(--s2);
+      max-width: 220px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+    .popover button{
+      min-width: 38px;
+      min-height: var(--h-sm);
+      padding: 0 var(--s2);
+      border-radius: var(--r-md);
+      font-weight: 800;
+    }
+
+    /* The list of tests.
+       ------------------------------------------------------------------
+       This list is the same control the Change Division picker is, and it is drawn
+       by the same rules: .pRow .pCol gives it the column, the 4px gap and the
+       full-width left-aligned buttons, and `.popover .pCol button[aria-pressed]`
+       gives it the accent that says which one you are already on. What is left here
+       is only what a *grouped* list needs on top of that — the scrolling, the
+       division headings, and the three things that can sit at the right-hand end of
+       a row.
+
+       It used to be a run of bare text rows bleeding into the panel's padding, with
+       a 4px bar of the division's color in the gutter. Two things were wrong with
+       that. The rows were the only clickable things in the app with no shape at
+       rest, twenty pixels from a sibling picker whose options are boxes. And the bar
+       painted a *fill* color as a foreground mark: --div2 on the light panel is
+       1.19:1, so in light mode it was not there at all. The color belongs to the
+       heading pill, which puts dark ink on the pastel and reads in both themes.
+
+       It takes whatever room the row leaves it — set as a max-height when the picker
+       opens — rather than a fixed box that silently cut the last division off. */
+    .popover .topicPopoverList{
+      /* .pCol already says column + nowrap; this only widens it and lets it scroll.
+         A wrapping column wraps *sideways*, which once sent the More fold off the
+         right-hand edge instead of scrolling — .pCol's nowrap is what prevents it. */
+      min-width: 244px;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      /* Room for the focus ring and the buttons' own borders, which would otherwise
+         be shaved by the scroll container's edge. */
+      padding: 2px;
+      margin: -2px;
+    }
+    /* a plain scrollbar is easy to miss on a dark panel; fade the cut-off edge too */
+    .topicPopoverList[data-more="1"]{
+      mask-image: linear-gradient(to bottom, #000 calc(100% - 22px), transparent 100%);
+      /* The fade eats the bottom 22px of whatever is under it, so a list scrolled to
+         its end finished on a half-erased row. This is the slack it fades into
+         instead — it only exists while the list actually scrolls. */
+      padding-bottom: 26px;
+    }
+
+
+    /* A row is a .popover .pCol button. Everything below is the grouped list's own
+       business: the name that has to truncate, and what may follow it. */
+    .topicOptionBtn .optName{
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      /* The button sets line-height:1, which is a box exactly as tall as the type and
+         so half a pixel short of a descender. Ellipsing needs overflow:hidden, and
+         the two together were shaving the tail off every g, y and p in the list. The
+         row centres its children, so a taller line box costs the row nothing. */
+      line-height: 1.45;
+    }
+    /* TBD names no test, so it is not typeset as one. */
+    .topicOptionBtn .optName.isTbd{ color: var(--muted); font-weight: 700; }
+    .topicOptionBtn[aria-pressed="true"] .optName.isTbd{ color: inherit; }
+    /* The convention ladder, as a mark rather than a refusal — a student sitting a
+       test below their own division's level. It was a 6px amber dot, which is the
+       shape this app uses for a *status* light and reads as decoration at that size;
+       it is the same triangle the caution tips carry now, so a warning looks like the
+       warnings everywhere else. It sits before the tick so the right edge stays a
+       column. */
+    .optWarn{
+      flex: 0 0 auto;
+      width: 13px;
+      height: 13px;
+      fill: none;
+      stroke: var(--warn);
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    /* The tick is the only thing that says "this is the one you are on", so it is
+       drawn in the same accent the pressed border already uses. */
+    .optTick{
+      flex: 0 0 auto;
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .topicOptionBtn:not([aria-pressed="true"]) .optTick{ display: none; }
+
+    /* The way out, and the one row that belongs to no division. It leads the list
+       rather than closing it: it is the answer for a student who should not be
+       sitting a topic test at all, so it wants to be reachable without reading the
+       whole list first — and at the bottom it was the row the scroller's own fade
+       landed on. Quieter than the choices under it, because it clears a state rather
+       than picking a test. */
+    .popover .pCol button.topicOptClear{
+      background: transparent;
+      color: var(--muted);
+    }
+    .popover .pCol button.topicOptClear:hover{ background: var(--btn); color: var(--text); }
+    .topicOptClear .optName{ font-weight: 700; }
+    /* the rule under it, drawn on its own element rather than as a border on the
+       button — a border there would sit inside the button's radius and move with it */
+    .topicClearSep{
+      flex: 0 0 auto;
+      height: 0;
+      margin: var(--s1) 0 var(--s2);
+      border-top: 1px solid var(--line2);
+    }
+
+    /* The division, as a division looks everywhere else. It replaced an uppercase
+       word that had to be told apart from the test names under it by letter-spacing
+       alone, and that started at a different x from them besides.
+       The list's gap is 4px; the extra top margin is what separates one division's
+       run from the last one's. */
+    .topicOptGroup{
+      display: flex;
+      align-items: center;
+      flex: 0 0 auto;
+      margin: var(--s2) 0 0;
+      padding: 0;
+    }
+    .topicOptGroup:first-child{ margin-top: 0; }
+    /* The pill is the same chip the division wears everywhere else in the app, so
+       its own shape is left alone: symmetric padding, length set by the name inside
+       it, label centred. Only its position is this list's business — its left edge
+       sits flush with the left edge of the option boxes it heads. (It was pulled 2px
+       further left than that, to make a capsule read as flush against 10px
+       rectangles; that overshoot is what warped the column.) */
+    .topicOptGroup .divPill{
+      margin-left: 0;
+      font-size: 10.5px;
+      /* tighter across than the chip wears elsewhere: at 10.5px the 8px ends read as
+         slack, and these sit in a narrow column of their own, where a capsule that
+         runs on past its word looks like a gap in the left edge rather than a label */
+      padding: 2px var(--s1);
+      min-height: 0;
+    }
+
+    .modalBack{
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--s5);
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(2px);
+    }
+    .modal{
+      width: min(760px, 100%);
+      max-height: 82vh;
+      overflow: auto;
+      padding: var(--s4);
+      background: var(--panel3);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+    }
+    .modalTop{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s3);
+      padding-bottom: var(--s3);
+      margin-bottom: var(--s3);
+      border-bottom: 1px solid var(--line2);
+      flex-wrap: wrap;
+    }
+    .modalTitle{ display: flex; align-items: center; gap: var(--s2); font-size: 15px; font-weight: 750; }
+    .modalList{ display: flex; flex-direction: column; gap: var(--s2); }
+
+    /* Fill Teams dialog
+       ------------------------------------------------------------------
+       A list, not a grid of cards. Six divisions in a 230px grid came to three rows of
+       two 48px boxes, each carrying a sentence that differed from the one beside it in
+       two numbers; read down, it was the same sentence six times. What a reader is
+       actually doing here is scanning for the divisions that still need something, so
+       the divisions are stacked in one column, each on one line, and the line says its
+       state rather than explaining the feature again. */
+    .fillModeRow{
+      display: flex;
+      align-items: center;
+      gap: var(--s3);
+      flex-wrap: wrap;
+      margin-bottom: var(--s3);
+    }
+    .fillModeRow .smallNote{ flex: 1 1 240px; min-width: 0; }
+
+    .fillList{ display: flex; flex-direction: column; gap: var(--s1); }
+    .fillRow{
+      display: flex;
+      align-items: center;
+      gap: var(--s3);
+      width: 100%;
+      padding: var(--s2) var(--s3);
+      text-align: left;
+    }
+    .fillRow .divPill{ flex: 0 0 auto; max-width: 50%; }
+    /* The state sits at the far end of the row, so six of them line up in a column and
+       the odd one out is found by shape rather than by reading. */
+    .fillRowState{
+      flex: 1 1 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--s2);
+      min-width: 0;
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 650;
+    }
+    .fillRowState span{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .fillRowState .glyph{ width: 13px; height: 13px; flex: 0 0 auto; }
+    /* The only rows that can be pressed are the only ones in the accent color: a
+       division with something to change reads as the live one, and the two settled
+       states — already seated, nobody added — go quiet and go disabled together. */
+    .fillRow[data-state="ready"] .fillRowState{ color: var(--accentInk); }
+
+    .fillAllRow{
+      display: flex;
+      align-items: center;
+      gap: var(--s3);
+      flex-wrap: wrap;
+      margin-top: var(--s4);
+      padding-top: var(--s3);
+      border-top: 1px solid var(--line2);
+    }
+
+    .dupItem{
+      padding: var(--s3);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-md);
+      background: var(--tint);
+    }
+    .dupNames{ color: var(--muted); margin-top: var(--s1); font-size: 12.5px; line-height: 1.5; }
+

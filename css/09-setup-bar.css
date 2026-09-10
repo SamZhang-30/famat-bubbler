@@ -1,0 +1,164 @@
+    /* ============================================================
+       Setup bar: four menus, each a <details> popover
+       ============================================================ */
+
+    /* One line, always. Below the width the menus need, this scrolls sideways
+       rather than wrapping: a second row would push the list down the page and
+       move every pinned band under it on a width the user is already short on. */
+    .setupBar{
+      display: flex;
+      align-items: center;
+      gap: var(--s2);
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      /* Evenly split, so the menus sit on the middle line of the bar. It used to be
+         8 above and 12 below to leave room for a scrollbar; the scrollbar no longer
+         needs room, and the same twenty pixels divided evenly keeps the bar exactly
+         the height it was. */
+      padding: calc((var(--s2) + var(--s3)) / 2) 0;
+      border-top: 1px solid var(--line2);
+    }
+
+    .topSection{
+      position: relative;
+      margin: 0;
+      flex: 0 0 auto;
+      border-radius: var(--r-pill);
+    }
+    .topSection > summary,
+    .setupChip{
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s2);
+      list-style: none;
+      cursor: pointer;
+      height: var(--ctlH);
+      padding: 0 var(--s3);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-pill);
+      background: var(--btn);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .topSection > summary::-webkit-details-marker{ display: none; }
+    .topSection > summary:hover,
+    .setupChip:hover{ background: var(--btnHover); }
+    .topSection > summary:focus-visible,
+    .setupChip:focus-visible{ box-shadow: var(--focusRing); }
+    /* The chevron belongs to the five menus that open downward from the bar. The
+       Competition chip opens a dialog, so it does not get one — it was borrowing the
+       summary's chrome wholesale and promising a dropdown it never had. */
+    .topSection > summary::after{
+      content: "";
+      width: 7px;
+      height: 7px;
+      margin-left: 2px;
+      border-right: 1.6px solid var(--muted);
+      border-bottom: 1.6px solid var(--muted);
+      transform: translateY(-2px) rotate(45deg);
+      transition: transform 120ms ease;
+    }
+    .topSection[open] > summary{
+      background: var(--btnHover);
+      border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+    }
+    .topSection[open] > summary::after{ transform: translateY(1px) rotate(-135deg); }
+
+    /* A menu that has nothing to offer at this competition. Still there, still
+       focusable, still able to say why — just not openable. */
+    .topSection[data-locked="1"] > summary{
+      opacity: 0.45;
+      cursor: help;
+      background: var(--btn);
+    }
+    .topSection[data-locked="1"] > summary:hover{ background: var(--btn); opacity: 0.6; }
+    .topSection[data-locked="1"] > summary::after{ opacity: 0.4; }
+    .topSection[data-locked="1"] .chipState{ opacity: 0.8; }
+    .menuIcon{
+      width: 14px;
+      height: 14px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.8;
+    }
+
+    /* Fixed, not absolute: the bar above scrolls sideways, and an absolutely
+       positioned child of a scroll container is clipped by it. JS (fitMenu) puts
+       this under its own summary, opening downward and to the right, and only
+       pulls it leftward when the viewport edge leaves no room. */
+    .topSectionBody{
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 45;
+      width: min(660px, 92vw);
+      /* Pinned header means a menu always opens the same distance down the viewport,
+         so the room it has is what is left between the header and the sticky footer. */
+      max-height: min(660px, calc(100vh - var(--pageHeadH, 120px) - var(--stickyH) - var(--s5)));
+      overflow: auto;
+      scrollbar-gutter: stable;
+      padding: var(--s4);
+      background: var(--panel3);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+    }
+    #menuPdfSetup > .topSectionBody{ width: min(530px, 92vw); }
+
+    /* A closed <details> hides its non-summary children on its own; saying so out loud
+       costs nothing and keeps the rule explicit. */
+    .topSection:not([open]) > .topSectionBody{ display: none; }
+    /* Where this box goes is decided in JS, so until that has happened the only
+       position it has is the 0,0 its own stylesheet gives it — the corner of the
+       window, nowhere near the menu it belongs to. Opening is a state change the
+       browser may paint before any of our code runs, so the panel is withheld until
+       fitMenu has placed it and says so. One frame later at worst; never in the
+       wrong place. */
+    .topSectionBody{ visibility: hidden; }
+    .topSectionBody[data-placed="1"]{ visibility: visible; }
+    .topSectionBody input[type="text"]{ min-width: 0; }
+    .topSectionBody textarea{ min-height: 132px; }
+    .topSectionBody > *:first-child{ margin-top: 0; }
+
+    /* menu title block */
+    .menuHead{ margin-bottom: var(--s3); }
+    /* inline-flex, so a chip anchored to the title sits beside it rather than
+       dropping onto a line of its own underneath — which is the whole reason these
+       notes name an anchor in the first place */
+    .menuTitle{
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s2);
+      font-size: 14px;
+      font-weight: 750;
+      color: var(--text);
+    }
+    .menuTitle + .infoTip{ vertical-align: middle; margin-left: var(--s2); }
+    .menuSub{ margin-top: 2px; font-size: 12px; line-height: 1.5; color: var(--muted); }
+
+    /* the On/Off state pill riding on a menu summary */
+    .chipState{
+      padding: 1px 7px;
+      border-radius: var(--r-pill);
+      border: 1px solid var(--line2);
+      background: var(--tint);
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+    .chipState[data-on="1"]{
+      background: color-mix(in srgb, var(--accent) 24%, transparent);
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+      color: var(--text);
+    }
