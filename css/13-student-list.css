@@ -418,7 +418,7 @@
          a phone, where fixed-width monospace digits need more room. The padding term keeps the box a constant width
          while the inset around it grows with density — the digits are the same size at
          every density, so it is the column that should give, not them. */
-      --wId:   calc(104px + (var(--rowPadY) - 4px) * 2);
+      --wId:   calc(112px + (var(--rowPadY) - 4px) * 2);
       --wTeam: 62px;
       --wInc:  62px;   /* "Added" measures 42px, so it sits in a Team-sized column */
 

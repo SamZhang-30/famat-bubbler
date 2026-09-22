@@ -112,7 +112,39 @@
       border: 1px solid var(--line);
       border-radius: var(--r-lg);
       box-shadow: var(--shadow);
+      /* WebKit can leave a fixed overflow box non-scrollable after a CSS mask is
+         composited, detached and attached again. Pinned menus use sticky fade
+         overlays instead, so reopening one never depends on that masked layer. */
+      -webkit-mask-image: none !important;
+      mask-image: none !important;
     }
+    .topSectionBody::before,
+    .topSectionBody::after{
+      content: "";
+      position: sticky;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: block;
+      height: var(--s4);
+      margin-left: calc(var(--s4) * -1);
+      margin-right: calc(var(--s4) * -1);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 90ms ease;
+    }
+    .topSectionBody::before{
+      top: calc(var(--s4) * -1);
+      margin-top: calc(var(--s4) * -1);
+      background: linear-gradient(to bottom, var(--panel3), transparent);
+    }
+    .topSectionBody::after{
+      bottom: calc(var(--s4) * -1);
+      margin-top: calc(var(--s4) * -1);
+      background: linear-gradient(to top, var(--panel3), transparent);
+    }
+    .topSectionBody[data-scroll~="top"]::before,
+    .topSectionBody[data-scroll~="bottom"]::after{ opacity: 1; }
     /* Portaled bodies are direct children of <body>, so they no longer inherit the
        page header's z-index stacking context. Keep ordinary bodies at 45, but put an
        open portaled body just above the header (46) so its rounded top edge is not

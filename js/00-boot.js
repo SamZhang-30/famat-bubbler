@@ -50,7 +50,7 @@
         density: "compact",     // compact | cozy | comfortable
         width: "wide",          // standard | wide | full
         accent: "#7aa2ff",
-        help: "on",      // on | off
+        help: true,       // compact explanatory chips are shown
         stickyHead: true,
         stickyTop: true,        // pin the page header (title, competition, setup bar)
         colSel: true,
@@ -151,11 +151,9 @@
         var comp = JSON.parse(localStorage.getItem("famatbubbler.competition.v1") || "null");
         if (comp && PALETTE_FOR_PRESET[comp.preset]) activePalette = PALETTE_FOR_PRESET[comp.preset];
       }catch(e){}
-      // The old pref was a boolean. `false` was a deliberate "hide it" and is kept as "off";
-      // `true` was only ever the old default, so it moves to the new default of hover chips.
-      if (typeof prefs.help === "boolean") prefs.help = prefs.help ? "on" : "off";
-      if (prefs.help === "hover") prefs.help = "on";
-      if (["on","off"].indexOf(prefs.help) < 0) prefs.help = "on";
+      // Older builds stored three text modes. Both visible modes now migrate to the
+      // same compact on state; only an explicit off remains off.
+      if (typeof prefs.help !== "boolean") prefs.help = prefs.help !== "off";
       if (["soft","normal","strong"].indexOf(prefs.tintStrength) < 0) prefs.tintStrength = "normal";
 
       function resolvedTheme(){
@@ -170,7 +168,7 @@
         r.dataset.theme = resolvedTheme();
         r.dataset.density = prefs.density;
         r.dataset.width = prefs.width;
-        r.dataset.help = prefs.help;
+        r.dataset.help = prefs.help ? "on" : "off";
         r.dataset.stickyhead = prefs.stickyHead ? "1" : "0";
         r.dataset.stickytop = prefs.stickyTop ? "1" : "0";
         r.dataset.colSel = prefs.colSel ? "1" : "0";

@@ -85,8 +85,6 @@ html[data-generating="1"] .progressBar{flex:1;min-width:20px;}
 .digitSlots input[data-incomplete="1"]{border-color:color-mix(in srgb,var(--danger) 60%,transparent);background:color-mix(in srgb,var(--danger) 12%,transparent);}
 .digitSlots input[data-incomplete="1"]:focus{border-color:color-mix(in srgb,var(--danger) 75%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--danger) 22%,transparent);}
 
-/* Setup guidance belongs beside its controls, including on touch screens. */
-html:not([data-help="off"]) .topSectionBody :is(div, p).smallNote{display:block;}
 .topSectionBody .smallNote{margin:var(--s2) 0 0;}
 .topSectionBody .smallNote[data-info="caution"]{padding:0;border:0;}
 /* Shared panel rhythm, without changing student table spacing. */

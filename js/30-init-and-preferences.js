@@ -370,10 +370,15 @@
         const viewportWidth = viewport ? viewport.width : window.innerWidth;
         const viewportTop = viewport ? viewport.offsetTop : 0;
         const viewportHeight = viewport ? viewport.height : window.innerHeight;
+        const active = document.activeElement;
+        const keyboardMode = viewportWidth <= 620 && active && body.contains(active)
+          && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName);
         const minTop = viewportTop + margin;
         const maxTop = Math.max(minTop,
           viewportTop + viewportHeight - stickyBarHeight() - margin - 160);
-        const top = Math.round(Math.min(Math.max(summary.bottom + gap, minTop), maxTop));
+        const top = keyboardMode
+          ? Math.round(minTop)
+          : Math.round(Math.min(Math.max(summary.bottom + gap, minTop), maxTop));
         const mobileCenter = viewportWidth <= 620;
         const finalLeft = mobileCenter
           ? Math.max(margin, (viewportWidth - width) / 2)
@@ -383,8 +388,10 @@
         body.style.top = top + "px";
         // The CSS ceiling assumes the pinned header; an unpinned one can sit anywhere
         // down the page, so the room left below the summary is what actually caps it.
-        const roomBelow = viewportTop + viewportHeight - top - stickyBarHeight() - margin;
-        body.style.maxHeight = Math.max(160, Math.round(roomBelow)) + "px";
+        const reservedBottom = keyboardMode ? margin : stickyBarHeight() + margin;
+        const roomBelow = viewportTop + viewportHeight - top - reservedBottom;
+        body.style.maxHeight = Math.max(120, Math.round(roomBelow)) + "px";
+        body.dataset.keyboard = keyboardMode ? "1" : "0";
         // it has a real position now, so it is allowed to be seen
         body.dataset.placed = "1";
       }
@@ -398,6 +405,19 @@
         setupDetails().forEach((d) => { if (d.open) fitMenu(d); });
       };
 
+      /* Only the setup strip needs to move when a trigger is clipped sideways.
+         Element.scrollIntoView also scrolls the document on iOS, which lets opening
+         a menu or focusing one of its fields throw the entire fixed header upward. */
+      function bringSummaryIntoBar(d){
+        const bar = d?.parentElement;
+        const summary = d?.querySelector("summary");
+        if (!bar || !summary) return;
+        const barRect = bar.getBoundingClientRect();
+        const summaryRect = summary.getBoundingClientRect();
+        if (summaryRect.left < barRect.left) bar.scrollLeft += summaryRect.left - barRect.left;
+        else if (summaryRect.right > barRect.right) bar.scrollLeft += summaryRect.right - barRect.right;
+      }
+
       /** Open it and place it together, so the first frame it exists in is the right one. */
       function openMenuPlaced(d){
         setupDetails().forEach((o) => { if (o !== d) closeMenu(o); });
@@ -406,7 +426,7 @@
         fitMenu(d);
         // An opened menu that is scrolled off the side of the bar has no visible
         // trigger, so bring its summary into the bar before pinning the body to it.
-        d.scrollIntoView({ block: "nearest", inline: "nearest" });
+        bringSummaryIntoBar(d);
         fitMenu(d);
         window.FBSyncScrollFades?.();
         requestAnimationFrame(() => window.FBSyncScrollFades?.());
@@ -448,7 +468,7 @@
           setupDetails().forEach((o) => { if (o !== d) closeMenu(o); });
           portalMenu(d);
           fitMenu(d);
-          d.scrollIntoView({ block: "nearest", inline: "nearest" });
+          bringSummaryIntoBar(d);
           fitMenu(d);
           window.FBSyncScrollFades?.();
           requestAnimationFrame(() => window.FBSyncScrollFades?.());
@@ -459,6 +479,14 @@
         window.visualViewport.addEventListener("resize", refitOpenMenus, { passive: true });
         window.visualViewport.addEventListener("scroll", refitOpenMenus, { passive: true });
       }
+      document.addEventListener("focusin", (ev) => {
+        if (!ev.target?.closest?.(".topSectionBody")) return;
+        requestAnimationFrame(refitOpenMenus);
+      });
+      document.addEventListener("focusout", (ev) => {
+        if (!ev.target?.closest?.(".topSectionBody")) return;
+        setTimeout(refitOpenMenus, 0);
+      });
       // A fixed body does not travel with its summary on its own: the page scrolling
       // under an unpinned header, or the bar scrolling sideways, both move one and
       // not the other.
@@ -635,7 +663,7 @@
       function buildInfoTips(){
         document.querySelectorAll("div.smallNote, p.smallNote").forEach((note) => {
           if (note.dataset.tipDone) return;
-          if (note.closest(".topSectionBody") || note.closest(".appHeader") || note.closest(".modal") || note.closest(".popover") || note.closest(".advBody")){
+          if (note.closest(".appHeader") || note.closest(".modal") || note.closest(".popover") || note.closest(".advBody")){
             note.dataset.tipDone = "1";
             return;
           }
