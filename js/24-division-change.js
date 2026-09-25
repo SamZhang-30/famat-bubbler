@@ -219,12 +219,8 @@
           rows.appendChild(row);
         }
 
-        /* TBD, where the picker puts it: last in the division, after the tests that
-           have names. It is not editable — there is nothing to type, which is the
-           whole point of it — so it is a stated row rather than a pair of fields, and
-           it appears only while the switch above is on. It is here at all because the
-           card is the list of what this division offers, and leaving TBD off it made
-           the card disagree with the menu it is configuring. */
+        /* TBD sits last and has a read-only field spanning the space occupied by a
+           named test's name, code, and actions. */
         if (cfg.tbdEnabled){
           const tbdKey = topicIndexLabel(g, 0);
           const tbdSeated = usage.get(tbdKey) || 0;
@@ -236,8 +232,8 @@
             ? `${tbdSeated} added ${tbdSeated === 1 ? "student is" : "students are"} on this division's TBD.`
             : "";
           tbdRow.innerHTML = `<span class="topicUse" data-empty="${tbdSeated ? "0" : "1"}">${PERSON_GLYPH}<span data-topic-count>${tbdSeated}</span></span>`
-            + `<span class="topicTbdName">TBD</span>`
-            + `<span class="topicTbdNote">prints the prefix alone</span>`
+            + `<span class="topicTbdField"><span class="topicTbdName">TBD</span>`
+            + `<span class="topicTbdNote">prints the prefix alone</span></span>`
             ;
           rows.appendChild(tbdRow);
         }

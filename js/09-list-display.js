@@ -28,7 +28,7 @@
       return (saved === "counts") ? "summary" : "table";
     }
 
-    function setListView(mode, {persist=true}={}){
+    function setListView(mode, {persist=true, render=true}={}){
       listView = (LIST_VIEWS.indexOf(mode) >= 0) ? mode : "table";
       if (persist){
         try{ window.FBStore.set(LIST_VIEW_KEY, listView); }catch(e){}
@@ -38,8 +38,10 @@
       const root = document.getElementById("studentsRoot");
       if (root) root.dataset.view = listView;
       syncListViewSeg();
-      renderAllRows();
-      syncAllCountersAndSummaries();
+      if (render){
+        renderAllRows();
+        syncAllCountersAndSummaries();
+      }
       syncSticky();
     }
 
@@ -267,4 +269,3 @@
       if (nextTeam === 1 || nextTeam === 2 || nextTeam === 3) c.hasAnyTeam = true;
       recalcDivOverflows(student.division);
     }
-

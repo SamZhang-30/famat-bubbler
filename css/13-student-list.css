@@ -96,6 +96,9 @@
       min-height: 0;
       max-height: var(--listMaxH, none);
     }
+    #studentsPanel[data-has-students="1"]{
+      height: var(--listMaxH, auto);
+    }
     /* the panel's own header now, not something pinned over the page */
     #studentsPanel > .listBar{ position: static; }
     #studentsRoot{
@@ -412,13 +415,9 @@
          wider inset takes. */
       --wDivMin: calc(117px + (var(--rowPadY) - 4px));
       --wDiv: var(--wDivMin);
-      /* Sized backwards from the ID box rather than picked: the box fills the cell, so
-         its width is this minus the cell's padding on both sides and the column rule.
-         Holding it at 95px leaves a little breathing room around the eight-slot run on
-         a phone, where fixed-width monospace digits need more room. The padding term keeps the box a constant width
-         while the inset around it grows with density — the digits are the same size at
-         every density, so it is the column that should give, not them. */
-      --wId:   calc(112px + (var(--rowPadY) - 4px) * 2);
+      /* Eight monospace slots plus the cell insets. Keep the width stable across
+         densities while giving the digits enough room at the smallest viewport. */
+      --wId:   calc(104px + (var(--rowPadY) - 4px) * 2);
       --wTeam: 62px;
       --wInc:  62px;   /* "Added" measures 42px, so it sits in a Team-sized column */
 

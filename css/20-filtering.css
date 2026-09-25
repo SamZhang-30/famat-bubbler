@@ -65,7 +65,8 @@
       cursor: pointer;
     }
     .filterChip .tick{
-      position: relative;
+      display: grid;
+      place-items: center;
       width: 13px;
       height: 13px;
       border: 1px solid var(--line);
@@ -76,14 +77,11 @@
        "on" and "off" has to survive being glanced at, not studied */
     .filterChip .tick::after{
       content: "";
-      position: absolute;
-      left: 3px;
-      top: 1px;
       width: 4px;
       height: 7px;
       border: solid #0f1115;
       border-width: 0 2px 2px 0;
-      transform: rotate(42deg);
+      transform: translateY(-1px) rotate(42deg);
       opacity: 0;
     }
     .filterChip[aria-pressed="true"]{ color: var(--text); border-color: var(--line); }
@@ -136,4 +134,3 @@
     }
     .shortcutRow:last-child{ border-bottom: none; }
     .shortcutRow .keys{ display: flex; gap: var(--s1); flex: 0 0 auto; }
-

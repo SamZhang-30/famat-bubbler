@@ -140,7 +140,7 @@
       }
       for (const d of [1,2,3,4,5,6,0]){
         setDivCountersText(d, dupSet);
-        if (listView === "summary") syncRollPanel(d);
+        if (students.length && listView === "summary") syncRollPanel(d);
       }
       syncTotalsBadges();
       syncListEmptyState();
@@ -160,6 +160,8 @@
       const empty = document.getElementById("studentsEmpty");
       const root = document.getElementById("studentsRoot");
       const dead = document.getElementById("searchEmpty");
+      const panel = document.getElementById("studentsPanel");
+      if (panel) panel.dataset.hasStudents = none ? "0" : "1";
       if (empty) empty.hidden = !none;
       if (none && dead) dead.hidden = true;
       // a live search that matches nothing owns the list's visibility until it clears

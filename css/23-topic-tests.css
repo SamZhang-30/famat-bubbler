@@ -75,18 +75,23 @@
     .topicRows{ display: flex; flex-direction: column; gap: var(--s2); }
     .topicRow{ display: flex; align-items: center; gap: var(--s1); min-width: 0; }
     .topicRow.isTbd .topicInput{ color: var(--muted); }
-    /* The division's TBD, stated rather than typed. It sits last in the card because
-       that is where the picker offers it, and the card is a preview of the picker.
-       Nothing here is a field: TBD is the option you take when there is no name yet,
-       so there is nothing to fill in and the row says so instead of pretending. */
+    /* Read-only field with the same outline and height as a test name input. */
     .topicTbdRow{
-      min-height: var(--h-sm);
-      padding-top: 2px;
       color: var(--muted);
+    }
+    .topicTbdField{
+      display: flex;
+      align-items: center;
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: var(--h-sm);
+      padding: 0 var(--s2);
+      border: 1px solid var(--line2);
+      border-radius: var(--r-sm);
+      background: var(--panel);
     }
     .topicTbdName{
       flex: 0 0 auto;
-      padding-left: var(--s2);
       font-size: 12.5px;
       font-weight: 700;
     }

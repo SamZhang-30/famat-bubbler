@@ -1,7 +1,7 @@
     // ====== Init ======
     // Ensure top buttons mirror view state
     function initViewSeg(){
-      setListView(loadListView(), {persist:false});
+      setListView(loadListView(), {persist:false, render:false});
     }
 
     // On load
@@ -41,7 +41,7 @@
       }
       syncUndoUI();
 
-      renderAllRows();
+      if (students.length) renderAllRows();
       syncAllCountersAndSummaries();
       syncSticky();
       refreshFixTeamsButtons();
@@ -1103,7 +1103,11 @@
           const bodyPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
           // the panel's own bottom margin sits below it and counts against the page too
           const ownMargin = parseFloat(getComputedStyle(panel).marginBottom) || 0;
-          const avail = window.innerHeight - topDoc - bodyPad - ownMargin;
+          // Safari may restore the visual viewport after the keyboard closes without
+          // restoring innerHeight in the same frame. Use the larger recovered height
+          // and listen for its separate resize event below.
+          const viewportH = Math.max(window.innerHeight, window.visualViewport?.height || 0);
+          const avail = viewportH - topDoc - bodyPad - ownMargin;
 
           // The frame's own chrome — the bar, the toolbar and the table's heading row —
           // costs about this much before a single student is drawn. Capping the panel
@@ -1115,6 +1119,15 @@
         }
       }
       window.addEventListener("resize", measureStickyOffsets);
+      if (window.visualViewport){
+        window.visualViewport.addEventListener("resize", measureStickyOffsets, { passive: true });
+        window.visualViewport.addEventListener("scroll", measureStickyOffsets, { passive: true });
+      }
+      document.addEventListener("focusout", (ev) => {
+        if (!ev.target.matches?.("input, textarea, select")) return;
+        requestAnimationFrame(measureStickyOffsets);
+        setTimeout(measureStickyOffsets, 350);
+      });
       document.addEventListener("DOMContentLoaded", measureStickyOffsets);
       setTimeout(measureStickyOffsets, 0);
       if (window.ResizeObserver){
