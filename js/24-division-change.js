@@ -287,8 +287,8 @@
       document.querySelectorAll("#division input").forEach(input=>{input.disabled=enabled;});
       const help=document.getElementById("divisionTestHelp");
       if(help)help.innerHTML=enabled
-        ? "<strong>Individual test fields are inactive.</strong> Topic Tests supplies the printed test name and code for every student. Unassigned students print neither. Turn Topic Tests off to edit these saved defaults."
-        : "<strong>Printed in the PDF’s Test field.</strong> One name and optional code per division, used when Topic Tests is off.";
+        ? '<strong>Topic Tests are on, so these fields are inactive.</strong> Topic Tests supplies the printed test name and code for every student. Unassigned students print neither. <button type="button" class="textLink" data-action="jumpToTopicTests">Open Topic Tests</button> to turn it off and edit these saved defaults.'
+        : "<strong>Individual Test Fields.</strong> One name and optional code per division, used when Topic Tests is off.";
       syncTopicChipState();
       const box = document.getElementById("topicTestsBox");
       if (box) box.style.display = enabled ? "block" : "none";

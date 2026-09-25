@@ -250,6 +250,12 @@
 
       if (action === "openCompetition"){ openCompetitionModal(); return; }
       if (action === "closeCompetition"){ closeCompetitionModal(); return; }
+      if (action === "jumpToTopicTests"){
+        closeCompetitionModal();
+        const menu = document.getElementById("menuTopics");
+        if (menu && !menu.open) menu.querySelector("summary")?.click();
+        return;
+      }
       if (action === "openCustomEditor"){ openCustomEditor(); return; }
       if (action === "closeCustomEditor"){ closeCustomEditor(); return; }
 

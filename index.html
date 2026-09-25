@@ -131,13 +131,10 @@
             <div class="row" style="margin-top:12px;">
               <button type="button" class="primary" data-action="readEnrollment">Load Enrollment List</button>
               <button type="button" class="danger" data-action="clearStudents">Clear Students</button>
-              <div class="smallNote" data-info="caution" style="margin:0;">
-                Loading only imports students not already listed in the table. To preserve your page
-                order, they are added to the bottom of the list. This does not remove existing students
-                or replace existing students. A different school is reviewed before import. To empty the whole list, click
-                &ldquo;Clear Students.&rdquo;
-              </div>
             </div>
+            <p class="rosterImportNote">Loading adds new students at the bottom; it does not remove or replace anyone
+              already listed. Use &ldquo;Clear Students&rdquo; to empty the table. If the roster's school name or ID
+              differs from your current settings, you will choose which to use before importing.</p>
           <div class="savedRosterSection" id="secSavedRosters">
             <div class="menuHead">
               <div class="menuTitle">Saved Rosters</div>
@@ -510,7 +507,7 @@
           <div id="topicTestsBox" style="display:none; margin-top:12px;">
             <div class="topicLegend">
               <span><strong>Test Name</strong> is what prints in the Test field.</span>
-              <span><strong>Code</strong> is the 3-digit number bubbled on the sheet. Leave it blank to bubble nothing.</span>
+              <span><strong>Code</strong> fills the three Test Code bubble columns at the bottom left of the Scantron. It does not change the student's bubbled FAMAT ID. Leave it blank to bubble nothing.</span>
             </div>
             <div class="topicGrid" id="topicTestGrid"></div>
             <div class="row topicPrefixBar">
@@ -1043,7 +1040,7 @@
         <summary>Printed Test Names and Codes</summary>
         <div class="compExplainBody">
         <div class="compHint" id="divisionTestHelp">
-          <strong>Individual Test Fields.</strong> These names and codes print when Topic Tests is off.
+          <strong>Individual Test Fields.</strong> These names and codes are used when Topic Tests is off.
         </div>
         <!-- Two boxes per division: what prints in the Test field, and the three
              digits bubbled beside it. Not a <label> any more — a label points at one
@@ -1052,48 +1049,48 @@
              The inputs are found by data-divlabel / data-divtestid rather than by
              position: the code that reads them used to take the first six inputs under
              #division, which was true right up until there were twelve. -->
-        <p class="smallNote">These fields change printed test text only. Clear a field to use its default. To rename a Custom division, use the division name editor.</p>
+        <p class="smallNote">When Topic Tests is off, the name prints in the PDF's Test field and the optional three-digit code fills the Test Code bubbles at the bottom left of the Scantron. The code does not change the student's bubbled FAMAT ID. Clear a field to use its default. To rename a Custom division, use the division name editor.</p>
         <div id="division" class="row" style="gap:12px;">
           <div class="field divTestField" data-divfield="1">
             <span class="fieldLabel" data-divcaption="1">1</span>
             <div class="divTestRow">
               <input type="text" id="divisionLabel1" data-divlabel="1" aria-label="Test name printed for division 1">
-              <input type="text" id="divisionTestId1" data-divtestid="1" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 1" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+              <input type="text" id="divisionTestId1" data-divtestid="1" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test code bubbled for division 1" title="Optional three-digit code for the bottom-left Test Code bubbles. It does not change the FAMAT ID.">
             </div>
           </div>
           <div class="field divTestField" data-divfield="2">
             <span class="fieldLabel" data-divcaption="2">2</span>
             <div class="divTestRow">
               <input type="text" id="divisionLabel2" data-divlabel="2" aria-label="Test name printed for division 2">
-              <input type="text" id="divisionTestId2" data-divtestid="2" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 2" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+              <input type="text" id="divisionTestId2" data-divtestid="2" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test code bubbled for division 2" title="Optional three-digit code for the bottom-left Test Code bubbles. It does not change the FAMAT ID.">
             </div>
           </div>
           <div class="field divTestField" data-divfield="3">
             <span class="fieldLabel" data-divcaption="3">3</span>
             <div class="divTestRow">
               <input type="text" id="divisionLabel3" data-divlabel="3" aria-label="Test name printed for division 3">
-              <input type="text" id="divisionTestId3" data-divtestid="3" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 3" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+              <input type="text" id="divisionTestId3" data-divtestid="3" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test code bubbled for division 3" title="Optional three-digit code for the bottom-left Test Code bubbles. It does not change the FAMAT ID.">
             </div>
           </div>
           <div class="field divTestField" data-divfield="4">
             <span class="fieldLabel" data-divcaption="4">4</span>
             <div class="divTestRow">
               <input type="text" id="divisionLabel4" data-divlabel="4" aria-label="Test name printed for division 4">
-              <input type="text" id="divisionTestId4" data-divtestid="4" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 4" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+              <input type="text" id="divisionTestId4" data-divtestid="4" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test code bubbled for division 4" title="Optional three-digit code for the bottom-left Test Code bubbles. It does not change the FAMAT ID.">
             </div>
           </div>
           <div class="field divTestField" data-divfield="5">
             <span class="fieldLabel" data-divcaption="5">5</span>
             <div class="divTestRow">
               <input type="text" id="divisionLabel5" data-divlabel="5" aria-label="Test name printed for division 5">
-              <input type="text" id="divisionTestId5" data-divtestid="5" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 5" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+              <input type="text" id="divisionTestId5" data-divtestid="5" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test code bubbled for division 5" title="Optional three-digit code for the bottom-left Test Code bubbles. It does not change the FAMAT ID.">
             </div>
           </div>
           <div class="field divTestField" data-divfield="6">
             <span class="fieldLabel" data-divcaption="6">6</span>
             <div class="divTestRow">
               <input type="text" id="divisionLabel6" data-divlabel="6" aria-label="Test name printed for division 6">
-              <input type="text" id="divisionTestId6" data-divtestid="6" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test ID bubbled for division 6" title="Optional. Three digits, bubbled in the same three columns a topic test code uses. Leave it blank to bubble nothing.">
+              <input type="text" id="divisionTestId6" data-divtestid="6" class="divTestIdInput" inputmode="numeric" maxlength="3" placeholder="###" aria-label="Test code bubbled for division 6" title="Optional three-digit code for the bottom-left Test Code bubbles. It does not change the FAMAT ID.">
             </div>
           </div>
         </div>

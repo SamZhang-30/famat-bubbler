@@ -184,6 +184,7 @@
     }
     .menuTitle + .infoTip{ vertical-align: middle; margin-left: var(--s2); }
     .menuSub{ margin-top: 2px; font-size: 12px; line-height: 1.5; color: var(--muted); }
+    .rosterImportNote{ margin: var(--s2) 0 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
 
     /* the On/Off state pill riding on a menu summary */
     .chipState{

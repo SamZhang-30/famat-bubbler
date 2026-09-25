@@ -737,11 +737,11 @@
       const parsed=parseEnrollmentText(text);
       const school=document.getElementById("school"), sid=document.getElementById("schoolId4");
       const prefix=parsed.schoolId || inferMostCommonFourDigitPrefixFromLines([],parsed.students.map(s=>s.id8));
-      const differs=students.length && ((parsed.school && school.value && parsed.school!==school.value) || (prefix && sid.value && prefix!==sid.value));
+      const differs=parsed.students.length > 0 && ((parsed.school && school.value && parsed.school!==school.value) || (prefix && sid.value && prefix!==sid.value));
       const review=document.getElementById("rosterSchoolReview");
       if(differs && !options.schoolChoice){
         review.hidden=false;
-        review.innerHTML=`<strong>Review the school before adding students</strong><p>This roster names ${escAttr(parsed.school || "another school")} (${escAttr(prefix)}). Your current school is ${escAttr(school.value)} (${escAttr(sid.value)}). The School field prints on every sheet.</p><button type="button" data-action="importKeepSchool">Keep Current School</button> <button type="button" data-action="importUseSchool">Use Roster School</button>`;
+        review.innerHTML=`<strong>Choose School Settings</strong><p>The school name prints on every sheet, and student IDs should share the School ID. This roster says ${escAttr(parsed.school || "no school name")} (ID ${escAttr(prefix || "not provided")}); your current settings are ${escAttr(school.value || "no school name")} (ID ${escAttr(sid.value || "not set")}). Choose which settings to use before importing. Student IDs are imported as written, so IDs that do not match the chosen School ID will need correction.</p><button type="button" data-action="importKeepSchool">Keep Current School</button> <button type="button" data-action="importUseSchool">Use Roster School</button>`;
         return;
       }
       review.hidden=true;
@@ -763,7 +763,7 @@
       resortIfSorted();rebuildRowIndex();renderAllRows();syncAllCountersAndSummaries();syncSticky();refreshFixTeamsButtons();
       pushUndo({type:"single",label:"Load enrollment list",diff:{type:"fullSnapshot",prev:before,next:getFullSnapshot()}});
       const result=document.getElementById("rosterImportResult");
-      result.innerHTML=`<p>${imported} students imported · ${existing} already listed · ${parsed.rejected.length} lines need attention. Choose who is added to the PDF next.</p>`;
+      result.innerHTML=`<p>${imported} students imported · ${existing} already listed · ${parsed.rejected.length} lines need attention.</p>`;
       if(parsed.rejected.length) result.innerHTML+=`<details open><summary>Review skipped lines</summary><ul>${parsed.rejected.map(r=>`<li><strong>Line ${r.line}:</strong> ${escAttr(r.reason)}<br><code>${escAttr(r.text)}</code></li>`).join("")}</ul></details>`;
       syncUndoUI();
     }

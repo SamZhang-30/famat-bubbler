@@ -632,16 +632,27 @@
       gap: var(--s3);
     }
     #divScroll > [data-divpanel]{ margin: 0; }
-    /* One outline, in the division's own color, the same width the whole way round.
-       It was a 3px stripe down the left edge and a 1px line on the other three, which
-       is two borders on one box: the card read as a plain panel wearing a marker
-       rather than as the division's own card, and the heavier left edge pushed the
-       content off the inset every other box on the page keeps. Uniform, the color is
-       the card. */
+    /* Use the table's neutral inset frame. The division color follows the full left
+       edge and a short part of both left-hand curves, like a bracket. */
     [data-divpanel]{
+      position: relative;
       margin: var(--s2) 0;
       padding: var(--s3);
-      border-color: var(--divStripe, var(--line2));
+      border-color: var(--line2);
+      background: var(--panel2);
+    }
+    [data-divpanel]::before{
+      content: "";
+      position: absolute;
+      top: -1px;
+      bottom: -1px;
+      left: -1px;
+      width: var(--r-md);
+      border-top: 3px solid var(--divStripe, var(--line2));
+      border-left: 3px solid var(--divStripe, var(--line2));
+      border-bottom: 3px solid var(--divStripe, var(--line2));
+      border-radius: var(--r-md) 0 0 var(--r-md);
+      pointer-events: none;
     }
     [data-divcolor="1"]{ --divStripe: var(--div1); }
     [data-divcolor="2"]{ --divStripe: var(--div2); }

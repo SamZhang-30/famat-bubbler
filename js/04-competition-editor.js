@@ -460,9 +460,18 @@
         const nameBox = divLabelInput(d);
         if (nameBox) nameBox.setAttribute("aria-label", `Test name printed for ${divName(d)}`);
         const idBox = divTestIdInput(d);
-        if (idBox) idBox.setAttribute("aria-label", `Test ID bubbled for ${divName(d)}`);
+        if (idBox) idBox.setAttribute("aria-label", `Test code bubbled for ${divName(d)}`);
         const field = document.querySelector(`[data-divfield="${d}"]`);
         if (field) field.hidden = !isActiveDivision(d);
+      }
+      // Keep the Test Names fields in the same order as the first Division sort.
+      const testFields = document.getElementById("division");
+      if (testFields){
+        const active = activeDivisions();
+        for (const d of active.concat([1,2,3,4,5,6].filter(d => !active.includes(d)))){
+          const field = testFields.querySelector(`[data-divfield="${d}"]`);
+          if (field) testFields.appendChild(field);
+        }
       }
 
       // Topic tests only exist at the conventions. The menu stays in place at a
