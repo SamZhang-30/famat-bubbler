@@ -131,6 +131,8 @@
         stepX: 17,
         useManualX: true,
         manualX: [105.6, 122.29, 138.98, 156, 173.02, 189.37, 206.05, 223.4, 240.64],
+        // Courier's visible numeral ink sits slightly left of its advance box.
+        inkNudgeX: 0.5,
         yFromTop: 214.7,
         size: 18,
       };
@@ -165,7 +167,7 @@
 
         const ch = id9.charAt(i);
 
-        const dx = digitX(i);
+        const dx = digitX(i) + DIG.inkNudgeX;
         const dy = yFlip(page, DIG.yFromTop);
 
         page.drawText(ch, { x: dx, y: dy, size: DIG.size, font, color: rgb(0, 0, 0) });
